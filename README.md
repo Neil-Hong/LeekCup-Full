@@ -1,5 +1,25 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+# Introduction
+
+This website is a simple draw system, it imitates the UEFA Champions League draw scenario.
+
+This website has been used by a streamer who has millions of followers in China during his streaming.
+
+Since the UEFA Champion Leagus will use Swiss-system tournament from 2024, This system follow the rules of Swiss-system tournament.
+
+According to the Leek Cup team amounts (24 teams), the pure Swiss-system tournament rules is not the best option, so from round 4, the upper bracket and lower bracket will be matched randomly, only 8 teams will advance to round 5. For details, please review the match table in round 4 page.
+
+# Technology Stack
+
+React, NextJS, TypeScript, Tailwind CSS, Threejs (react-three-fiber, react-three-drei), VideoJS, react-audio-player
+
+# Preview
+
+![image](https://github.com/Neil-Hong/ChampionLeague-Draw/blob/main/public/images/preview-1.png)
+![image](https://github.com/Neil-Hong/ChampionLeague-Draw/blob/main/public/images/preview-2.png)
+![image](https://github.com/Neil-Hong/ChampionLeague-Draw/blob/main/public/images/preview-3.png)
+
 ## Getting Started
 
 First, run the development server:
