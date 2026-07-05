@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import ReactAudioPlayer from "react-audio-player";
 import { TEAMS, STAGE_1, STAGE_2, STAGE_3 } from "@/data/teams";
@@ -9,7 +9,9 @@ import { rangeRam } from "@/utils/drawUtils";
 const TOTAL_TEAMS = 24;
 
 export default function DrawPage() {
-  const [randomArr, setRandomArr] = useState<number[]>(() => rangeRam([1, TOTAL_TEAMS], TOTAL_TEAMS));
+  const [randomArr, setRandomArr] = useState<number[]>(() =>
+    rangeRam([1, TOTAL_TEAMS], TOTAL_TEAMS),
+  );
   const [count, setCount] = useState(1);
   const [arr, setArr] = useState<number[]>([]);
   const [flag, setFlag] = useState(true);
@@ -59,7 +61,9 @@ export default function DrawPage() {
         2022-2023 Season &nbsp;&nbsp;84452 LEEK CUP DRAW CEREMONY
       </h2>
       <div className="title">
-        <h1 className="text-2xl sm:text-3xl text-white font-bold">参赛队伍巡礼</h1>
+        <h1 className="text-2xl sm:text-3xl text-white font-bold">
+          参赛队伍巡礼
+        </h1>
         <h2 className="text-lg sm:text-xl text-white">Clubs in the draw</h2>
       </div>
 
@@ -71,10 +75,14 @@ export default function DrawPage() {
 
       <div className="flex flex-row flex-wrap justify-center gap-4 my-4">
         <button className="drawButton" onClick={handleDraw}>
-          抽签<br />Draw
+          抽签
+          <br />
+          Draw
         </button>
         <button className="drawButton" onClick={handleReset}>
-          重新抽签<br />Redraw
+          重新抽签
+          <br />
+          Redraw
         </button>
       </div>
 
@@ -94,12 +102,20 @@ export default function DrawPage() {
           return (
             <div className="match-table-row" key={i}>
               <div className={`match-table-team info-${pairNum * 2 - 1}`}>
-                <div>{revealA && teamA && <img src={TEAMS[teamA].img} alt="logo" />}</div>
+                <div>
+                  {revealA && teamA && (
+                    <img src={TEAMS[teamA].img} alt="logo" />
+                  )}
+                </div>
                 <div>{revealA && teamA ? TEAMS[teamA].name : null}</div>
               </div>
               <div>vs</div>
               <div className={`match-table-team info-${pairNum * 2}`}>
-                <div>{revealB && teamB && <img src={TEAMS[teamB].img} alt="logo" />}</div>
+                <div>
+                  {revealB && teamB && (
+                    <img src={TEAMS[teamB].img} alt="logo" />
+                  )}
+                </div>
                 <div>{revealB && teamB ? TEAMS[teamB].name : null}</div>
               </div>
             </div>
@@ -113,13 +129,29 @@ export default function DrawPage() {
 
 function BackButton() {
   return (
-    <Link href="/" className="fixed top-3 right-3 z-50 text-white text-sm bg-black/50 hover:bg-black/70 px-3 py-1.5 rounded-lg transition-colors no-underline border border-white/20">
-      返回<br />Back
+    <Link
+      href="/entrance"
+      className="fixed top-3 right-3 z-50 text-white text-sm bg-black/50 hover:bg-black/70 px-3 py-1.5 rounded-lg transition-colors no-underline border border-white/20"
+    >
+      返回
+      <br />
+      Back
     </Link>
   );
 }
 
 function RenderStage({ images }: { images: string[] }) {
+  const [translateZ, setTranslateZ] = useState(650);
+
+  useEffect(() => {
+    const update = () => {
+      setTranslateZ(window.innerWidth <= 768 ? 250 : 650);
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
   return (
     <div className="stageContainer">
       <div className="stage">
@@ -130,7 +162,7 @@ function RenderStage({ images }: { images: string[] }) {
                 className="img"
                 key={i}
                 style={{
-                  transform: `rotateY(${35 + (i + 1) * 45}deg) translateZ(650px)`,
+                  transform: `rotateY(${35 + (i + 1) * 45}deg) translateZ(${translateZ}px)`,
                 }}
               >
                 <img src={img} alt="" />

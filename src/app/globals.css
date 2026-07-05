@@ -185,7 +185,7 @@ video {
 /* ===== Match Table ===== */
 .match-table {
   width: min(90%, 1200px);
-  height: 400px;
+  height: 600px;
   display: grid;
   grid-template-rows: repeat(4, 1fr);
   row-gap: 40px;
@@ -218,11 +218,13 @@ video {
   font-size: 20px;
   font-weight: 800;
   padding-left: 4px;
+  height: 100%;
 }
 
 .match-table-team img {
   max-width: 60px;
   max-height: 50px;
+  margin: auto;
   object-fit: contain;
 }
 
@@ -261,11 +263,13 @@ video {
   font-size: 20px;
   font-weight: 800;
   padding-left: 4px;
+  height: 100%;
 }
 
 .r-match-table-team img {
   max-width: 60px;
   max-height: 50px;
+  margin: auto;
   object-fit: contain;
 }
 
@@ -783,7 +787,7 @@ video {
   }
   .match-table-team {
     font-size: 11px;
-    grid-template-columns: 1fr;
+    grid-template-columns: 0.3fr 1fr;
   }
   .match-table-team img {
     max-width: 35px;
@@ -799,7 +803,7 @@ video {
   }
   .r-match-table-team {
     font-size: 11px;
-    grid-template-columns: 1fr;
+    grid-template-columns: 0.4fr 1fr;
   }
   .r-match-table-team img {
     max-width: 35px;

@@ -10,7 +10,7 @@ import Link from "next/link";
 function BackBtn() {
   return (
     <Link
-      href="/"
+      href="/entrance"
       className="fixed top-3 right-3 z-50 text-white text-sm bg-black/50 hover:bg-black/70 px-3 py-1.5 rounded-lg transition-colors no-underline border border-white/20"
     >
       返回

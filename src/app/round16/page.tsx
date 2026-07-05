@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ReactAudioPlayer from "react-audio-player";
 import { ROUND16_UPPER, ROUND16_LOWER } from "@/data/teams";
 import { useDrawState, scrollAnimate } from "@/utils/drawUtils";
@@ -9,8 +9,13 @@ import Link from "next/link";
 
 function BackBtn() {
   return (
-    <Link href="/" className="fixed top-3 right-3 z-50 text-white text-sm bg-black/50 hover:bg-black/70 px-3 py-1.5 rounded-lg transition-colors no-underline border border-white/20">
-      返回<br />Back
+    <Link
+      href="/entrance"
+      className="fixed top-3 right-3 z-50 text-white text-sm bg-black/50 hover:bg-black/70 px-3 py-1.5 rounded-lg transition-colors no-underline border border-white/20"
+    >
+      返回
+      <br />
+      Back
     </Link>
   );
 }
@@ -18,9 +23,12 @@ function BackBtn() {
 export default function Round16Page() {
   const upper = useDrawState(12, "info-");
   const lower = useDrawState(12, "info2-");
-  const showVideo = (upper.arr[0] === 1 && upper.flag) || (lower.arr[0] === 1 && lower.flag);
+  const showVideo =
+    (upper.arr[0] === 1 && upper.flag) || (lower.arr[0] === 1 && lower.flag);
 
-  useEffect(() => { scrollAnimate(".r-match-table-row"); }, []);
+  useEffect(() => {
+    scrollAnimate(".r-match-table-row");
+  }, []);
 
   return (
     <div className="ScoreBoard text-center">
@@ -34,14 +42,22 @@ export default function Round16Page() {
       </h2>
 
       <DrawSection
-        title="胜者组抽签池" subtitle="Upper Bracket Round 2"
-        bracketTitle="1-0 胜者组" bracketSubtitle="Upper Bracket R2"
-        group={ROUND16_UPPER} state={upper} infoPrefix="info-"
+        title="胜者组抽签池"
+        subtitle="Upper Bracket Round 2"
+        bracketTitle="1-0 胜者组"
+        bracketSubtitle="Upper Bracket R2"
+        group={ROUND16_UPPER}
+        state={upper}
+        infoPrefix="info-"
       />
       <DrawSection
-        title="败者组抽签池" subtitle="Lower Bracket Round 2"
-        bracketTitle="0-1 败者组" bracketSubtitle="Lower Bracket R2"
-        group={ROUND16_LOWER} state={lower} infoPrefix="info2-"
+        title="败者组抽签池"
+        subtitle="Lower Bracket Round 2"
+        bracketTitle="0-1 败者组"
+        bracketSubtitle="Lower Bracket R2"
+        group={ROUND16_LOWER}
+        state={lower}
+        infoPrefix="info2-"
       />
 
       {showVideo && (
@@ -58,41 +74,94 @@ export default function Round16Page() {
 }
 
 function DrawSection({
-  title, subtitle, bracketTitle, bracketSubtitle,
-  group, state, infoPrefix,
+  title,
+  subtitle,
+  bracketTitle,
+  bracketSubtitle,
+  group,
+  state,
+  infoPrefix,
 }: {
-  title: string; subtitle: string; bracketTitle: string; bracketSubtitle: string;
-  group: Record<number, Team>; state: ReturnType<typeof useDrawState>; infoPrefix: string;
+  title: string;
+  subtitle: string;
+  bracketTitle: string;
+  bracketSubtitle: string;
+  group: Record<number, Team>;
+  state: ReturnType<typeof useDrawState>;
+  infoPrefix: string;
 }) {
   const indices = Object.keys(group).map(Number);
   return (
     <>
-      <h1 className="text-2xl sm:text-3xl text-white font-bold mt-6">{title}</h1>
+      <h1 className="text-2xl sm:text-3xl text-white font-bold mt-6">
+        {title}
+      </h1>
       <h2 className="text-lg sm:text-xl text-white">{subtitle}</h2>
       <div className="stageContainer-container">
         <RenderStage group={group} indices={indices.slice(0, 6)} />
         <RenderStage group={group} indices={indices.slice(6, 12)} />
       </div>
       <div className="draw-round2">
-        <BracketDisplay group={group} indices={indices} title={bracketTitle} subtitle={bracketSubtitle} />
-        <MatchTable group={group} randomArr={state.randomArr} arr={state.arr} infoPrefix={infoPrefix} />
+        <BracketDisplay
+          group={group}
+          indices={indices}
+          title={bracketTitle}
+          subtitle={bracketSubtitle}
+        />
+        <MatchTable
+          group={group}
+          randomArr={state.randomArr}
+          arr={state.arr}
+          infoPrefix={infoPrefix}
+        />
       </div>
       <div className="ScoreBoard-button-container">
-        <button className="drawButton" onClick={state.handleDraw}>抽签<br />Draw</button>
-        <button className="drawButton" onClick={state.handleReset}>重新抽签<br />Redraw</button>
+        <button className="drawButton" onClick={state.handleDraw}>
+          抽签
+          <br />
+          Draw
+        </button>
+        <button className="drawButton" onClick={state.handleReset}>
+          重新抽签
+          <br />
+          Redraw
+        </button>
       </div>
     </>
   );
 }
 
-function RenderStage({ group, indices }: { group: Record<number, Team>; indices: number[] }) {
+function RenderStage({
+  group,
+  indices,
+}: {
+  group: Record<number, Team>;
+  indices: number[];
+}) {
+  const [translateZ, setTranslateZ] = useState(550);
+
+  useEffect(() => {
+    const update = () => {
+      setTranslateZ(window.innerWidth <= 768 ? 200 : 550);
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
   return (
     <div className="stageContainer">
       <div className="stage">
         <div className="control">
           <div className="imgWrap">
             {indices.map((idx, i) => (
-              <div className="img" key={i} style={{ transform: `rotateY(${35 + (i + 1) * 60}deg) translateZ(550px)` }}>
+              <div
+                className="img"
+                key={i}
+                style={{
+                  transform: `rotateY(${35 + (i + 1) * 60}deg) translateZ(${translateZ}px)`,
+                }}
+              >
                 <img src={group[idx].img} alt={group[idx].name} />
               </div>
             ))}
@@ -103,8 +172,16 @@ function RenderStage({ group, indices }: { group: Record<number, Team>; indices:
   );
 }
 
-function BracketDisplay({ group, indices, title, subtitle }: {
-  group: Record<number, Team>; indices: number[]; title: string; subtitle: string;
+function BracketDisplay({
+  group,
+  indices,
+  title,
+  subtitle,
+}: {
+  group: Record<number, Team>;
+  indices: number[];
+  title: string;
+  subtitle: string;
 }) {
   return (
     <div className="club-bracket">
@@ -113,7 +190,12 @@ function BracketDisplay({ group, indices, title, subtitle }: {
       {[0, 4, 8].map((start) => (
         <div key={start} className="mb-4">
           {indices.slice(start, start + 4).map((idx) => (
-            <img key={idx} src={group[idx].img} alt={group[idx].name} className="inline-block" />
+            <img
+              key={idx}
+              src={group[idx].img}
+              alt={group[idx].name}
+              className="inline-block"
+            />
           ))}
         </div>
       ))}
@@ -121,8 +203,16 @@ function BracketDisplay({ group, indices, title, subtitle }: {
   );
 }
 
-function MatchTable({ group, randomArr, arr, infoPrefix }: {
-  group: Record<number, Team>; randomArr: number[]; arr: number[]; infoPrefix: string;
+function MatchTable({
+  group,
+  randomArr,
+  arr,
+  infoPrefix,
+}: {
+  group: Record<number, Team>;
+  randomArr: number[];
+  arr: number[];
+  infoPrefix: string;
 }) {
   const pairs: [number, number][] = [];
   for (let i = 0; i < randomArr.length; i += 2) {
@@ -137,12 +227,16 @@ function MatchTable({ group, randomArr, arr, infoPrefix }: {
         return (
           <div className="r-match-table-row" key={i}>
             <div className={`r-match-table-team ${infoPrefix}${pn * 2 - 1}`}>
-              <div>{ra && teamA && <img src={group[teamA].img} alt="logo" />}</div>
+              <div>
+                {ra && teamA && <img src={group[teamA].img} alt="logo" />}
+              </div>
               <div>{ra && teamA ? group[teamA].name : null}</div>
             </div>
             <div>vs</div>
             <div className={`r-match-table-team ${infoPrefix}${pn * 2}`}>
-              <div>{rb && teamB && <img src={group[teamB].img} alt="logo" />}</div>
+              <div>
+                {rb && teamB && <img src={group[teamB].img} alt="logo" />}
+              </div>
               <div>{rb && teamB ? group[teamB].name : null}</div>
             </div>
           </div>
