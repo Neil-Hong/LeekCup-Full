@@ -55,10 +55,10 @@ export default function DrawPage() {
       <BackButton />
       <ReactAudioPlayer src="/audio/theme.mp3" autoPlay loop volume={0.3} />
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
-        2022-2023赛季 84452韭菜杯抽签仪式
+        2026-2027赛季 84452韭菜杯抽签仪式
       </h1>
       <h2 className="text-lg sm:text-xl text-white mt-2">
-        2022-2023 Season &nbsp;&nbsp;84452 LEEK CUP DRAW CEREMONY
+        2026-2027 Season &nbsp;&nbsp;84452 LEEK CUP DRAW CEREMONY
       </h2>
       <div className="title">
         <h1 className="text-2xl sm:text-3xl text-white font-bold">

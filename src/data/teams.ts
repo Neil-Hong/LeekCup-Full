@@ -30,18 +30,36 @@ export const TEAMS: Record<number, Team> = {
 };
 
 export const STAGE_1 = [
-  P("AC.png"), P("Barcelona.png"), P("Chelsea.png"), P("MC.png"),
-  P("Sunderland.png"), P("Liverpool.png"), P("PSG.png"), P("CP.png"),
+  P("AC.png"),
+  P("Barcelona.png"),
+  P("Chelsea.png"),
+  P("MC.png"),
+  P("Sunderland.png"),
+  P("Liverpool.png"),
+  P("PSG.png"),
+  P("CP.png"),
 ];
 
 export const STAGE_2 = [
-  P("RealMadrid.png"), P("Arsenal.png"), P("SB29.png"), P("Birmingham.png"),
-  P("Villarreal_CF.png"), P("Bayern.png"), P("Frankfurt.png"), P("MU.png"),
+  P("RealMadrid.png"),
+  P("Arsenal.png"),
+  P("SB29.png"),
+  P("Birmingham.png"),
+  P("Villarreal_CF.png"),
+  P("Bayern.png"),
+  P("Frankfurt.png"),
+  P("MU.png"),
 ];
 
 export const STAGE_3 = [
-  P("Club_Brugge.png"), P("InterMilan.png"), P("Wolverhampton.png"), P("Newcastle.png"),
-  P("Aston_Villa.png"), P("Brighton.png"), P("Southampton.png"), P("Lazio.png"),
+  P("Club_Brugge.png"),
+  P("InterMilan.png"),
+  P("Wolverhampton.png"),
+  P("Newcastle.png"),
+  P("Aston_Villa.png"),
+  P("Brighton.png"),
+  P("Southampton.png"),
+  P("Lazio.png"),
 ];
 
 export const ROUND16_UPPER: Record<number, Team> = {

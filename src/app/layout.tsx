@@ -13,13 +13,17 @@ export const metadata: Metadata = {
   description: "84452 Leek Cup draw ceremony",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="zh-CN">
       <body
         className={`${quint.className} min-h-screen w-full`}
         style={{
-          backgroundImage: "url(/images/bg4.jpg)",
+          backgroundImage: "url(/images/bg4.png)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundAttachment: "fixed",

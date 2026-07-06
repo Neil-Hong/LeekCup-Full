@@ -6,22 +6,31 @@ import { scrollAnimate } from "@/utils/drawUtils";
 import Link from "next/link";
 
 const TOTAL_MATCHES = 9;
+const TOTAL_INPUTS = TOTAL_MATCHES * 2;
+
+const createEmptyScores = () => {
+  const init: Record<string, string> = {};
+  for (let i = 1; i <= TOTAL_INPUTS; i++) init[`t${i}`] = "";
+  return init;
+};
 
 function BackBtn() {
   return (
-    <Link href="/" className="fixed top-3 right-3 z-50 text-white text-sm bg-black/50 hover:bg-black/70 px-3 py-1.5 rounded-lg transition-colors no-underline border border-white/20">
-      返回<br />Back
+    <Link
+      href="/"
+      className="fixed top-3 right-3 z-50 text-white text-sm bg-black/50 hover:bg-black/70 px-3 py-1.5 rounded-lg transition-colors no-underline border border-white/20"
+    >
+      返回
+      <br />
+      Back
     </Link>
   );
 }
 
 export default function Round4Page() {
-  const [input, setInput] = useState<Record<string, string>>({});
+  const [input, setInput] = useState<Record<string, string>>(createEmptyScores);
 
   useEffect(() => {
-    const init: Record<string, string> = {};
-    for (let i = 1; i <= 18; i++) init[`t${i}`] = "";
-    setInput(init);
     scrollAnimate(".r-match-table-row");
   }, []);
 
@@ -40,39 +49,73 @@ export default function Round4Page() {
     <div className="ScoreBoard text-center">
       <BackBtn />
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
-        2022-2023赛季 84452韭菜杯 第四轮
+        2026-2027赛季 84452韭菜杯 第四轮
       </h1>
       <h2 className="text-lg sm:text-xl text-white mt-2">
-        2022-2023 Season &nbsp;&nbsp;84452 LEEK CUP DRAW ROUND 4
+        2026-2027 Season &nbsp;&nbsp;84452 LEEK CUP DRAW ROUND 4
       </h2>
-      <img src="/images/WinnerRoad.png" alt="road" className="max-w-full mx-auto" />
+      <img
+        src="/images/WinnerRoad.png"
+        alt="road"
+        className="max-w-full mx-auto"
+      />
 
       <div className="draw-round2-4 mt-10">
         <div className="club-bracket" style={{ backgroundColor: "green" }}>
           <h1 className="text-xl text-white">晋级池</h1>
           <h2 className="text-sm text-white/70">Playoff Bracket Round 4</h2>
           <div>
-            <img src={ROUND4_PLAYOFF[1].img} alt={ROUND4_PLAYOFF[1].name} className="inline-block" />
-            <img src={ROUND4_PLAYOFF[2].img} alt={ROUND4_PLAYOFF[2].name} className="inline-block" />
-            <img src={ROUND4_PLAYOFF[3].img} alt={ROUND4_PLAYOFF[3].name} className="inline-block" />
+            <img
+              src={ROUND4_PLAYOFF[1].img}
+              alt={ROUND4_PLAYOFF[1].name}
+              className="inline-block"
+            />
+            <img
+              src={ROUND4_PLAYOFF[2].img}
+              alt={ROUND4_PLAYOFF[2].name}
+              className="inline-block"
+            />
+            <img
+              src={ROUND4_PLAYOFF[3].img}
+              alt={ROUND4_PLAYOFF[3].name}
+              className="inline-block"
+            />
           </div>
         </div>
         <div className="club-bracket" style={{ backgroundColor: "red" }}>
           <h1 className="text-xl text-white">淘汰池</h1>
           <h2 className="text-sm text-white/70">Eliminated Bracket Round 4</h2>
           <div>
-            <img src={ROUND4_PLAYOFF[4].img} alt={ROUND4_PLAYOFF[4].name} className="inline-block" />
-            <img src={ROUND4_PLAYOFF[5].img} alt={ROUND4_PLAYOFF[5].name} className="inline-block" />
-            <img src={ROUND4_PLAYOFF[6].img} alt={ROUND4_PLAYOFF[6].name} className="inline-block" />
+            <img
+              src={ROUND4_PLAYOFF[4].img}
+              alt={ROUND4_PLAYOFF[4].name}
+              className="inline-block"
+            />
+            <img
+              src={ROUND4_PLAYOFF[5].img}
+              alt={ROUND4_PLAYOFF[5].name}
+              className="inline-block"
+            />
+            <img
+              src={ROUND4_PLAYOFF[6].img}
+              alt={ROUND4_PLAYOFF[6].name}
+              className="inline-block"
+            />
           </div>
         </div>
       </div>
 
       <div className="ScoreBoard-button-container mt-4">
-        <Link href="/stats" className="drawButton">技术统计<br />Stats</Link>
+        <Link href="/stats" className="drawButton">
+          技术统计
+          <br />
+          Stats
+        </Link>
       </div>
 
-      <h1 className="text-2xl sm:text-3xl text-white font-bold mt-6">第四轮对阵</h1>
+      <h1 className="text-2xl sm:text-3xl text-white font-bold mt-6">
+        第四轮对阵
+      </h1>
       <h2 className="text-lg sm:text-xl text-white">Round 4 Match Table</h2>
 
       <div className="stageContainer-container">
@@ -88,16 +131,38 @@ export default function Round4Page() {
             return (
               <div className="r-match-table-row" key={i}>
                 <div className={`r-match-table-1-info info2-${a}`}>
-                  <div><img src={ROUND4_MATCHES[a].img} alt="" /></div>
+                  <div>
+                    <img src={ROUND4_MATCHES[a].img} alt="" />
+                  </div>
                   <div>{ROUND4_MATCHES[a].name}</div>
-                  <input type="number" name={`t${a}`} value={input[`t${a}`] || ""}
-                    onChange={(e) => setInput((p) => ({ ...p, [e.target.name]: e.target.value }))} />
+                  <input
+                    type="number"
+                    name={`t${a}`}
+                    value={input[`t${a}`] || ""}
+                    onChange={(e) =>
+                      setInput((p) => ({
+                        ...p,
+                        [e.target.name]: e.target.value,
+                      }))
+                    }
+                  />
                 </div>
                 <div>vs</div>
                 <div className={`r-match-table-2-info info2-${b}`}>
-                  <input type="number" name={`t${b}`} value={input[`t${b}`] || ""}
-                    onChange={(e) => setInput((p) => ({ ...p, [e.target.name]: e.target.value }))} />
-                  <div><img src={ROUND4_MATCHES[b].img} alt="" /></div>
+                  <input
+                    type="number"
+                    name={`t${b}`}
+                    value={input[`t${b}`] || ""}
+                    onChange={(e) =>
+                      setInput((p) => ({
+                        ...p,
+                        [e.target.name]: e.target.value,
+                      }))
+                    }
+                  />
+                  <div>
+                    <img src={ROUND4_MATCHES[b].img} alt="" />
+                  </div>
                   <div>{ROUND4_MATCHES[b].name}</div>
                 </div>
               </div>
@@ -117,8 +182,17 @@ function RenderStage({ indices }: { indices: number[] }) {
         <div className="control">
           <div className="imgWrap">
             {indices.map((idx, i) => (
-              <div className="img" key={i} style={{ transform: `rotateY(${35 + (i + 1) * 40}deg) translateZ(750px)` }}>
-                <img src={ROUND4_MATCHES[idx].img} alt={ROUND4_MATCHES[idx].name} />
+              <div
+                className="img"
+                key={i}
+                style={{
+                  transform: `rotateY(${35 + (i + 1) * 40}deg) translateZ(750px)`,
+                }}
+              >
+                <img
+                  src={ROUND4_MATCHES[idx].img}
+                  alt={ROUND4_MATCHES[idx].name}
+                />
               </div>
             ))}
           </div>

@@ -67,6 +67,18 @@ interface StatRow {
   val: string;
 }
 
+interface StatsCardProps {
+  title: string;
+  end: number;
+  suffix?: string;
+  subtitle: string;
+  img: string;
+  subVal1: string;
+  subLabel1: string;
+  subVal2: string;
+  subLabel2: string;
+}
+
 export default function StatsPage() {
   useEffect(() => {
     scrollAnimate(".bar", "scale-up-hor-left");
@@ -118,10 +130,10 @@ export default function StatsPage() {
     <div className="stats text-center">
       <BackBtn />
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
-        2022-2023赛季 84452韭菜杯
+        2026-2027赛季 84452韭菜杯
       </h1>
       <h2 className="text-lg sm:text-xl text-white">
-        2022-2023 Season &nbsp;&nbsp;84452 LEEK CUP
+        2026-2027 Season &nbsp;&nbsp;84452 LEEK CUP
       </h2>
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
         技术统计(截至第三轮)
@@ -200,7 +212,7 @@ function StatsCard({
   subLabel1,
   subVal2,
   subLabel2,
-}: any) {
+}: StatsCardProps) {
   return (
     <div className="stats-card">
       <p className="text-left text-xl">{title}</p>
@@ -255,7 +267,9 @@ function PlayerCard({ title, data }: { title: string; data: StatRow[] }) {
       <div className="playerCard">
         {data.map((row, i) => (
           <React.Fragment key={i}>
-            <div className={i === 0 ? "playerCard-row1" : "playerCard-row-white"}>
+            <div
+              className={i === 0 ? "playerCard-row1" : "playerCard-row-white"}
+            >
               {row.rank}
             </div>
             {i === 0 ? (
@@ -269,7 +283,9 @@ function PlayerCard({ title, data }: { title: string; data: StatRow[] }) {
                 <div>{row.name}</div>
               </div>
             )}
-            <div className={i === 0 ? "playerCard-row1" : "playerCard-row-white"}>
+            <div
+              className={i === 0 ? "playerCard-row1" : "playerCard-row-white"}
+            >
               {row.val}
             </div>
           </React.Fragment>
@@ -297,7 +313,9 @@ function TeamCard({
       <div className="playerCard">
         {data.map((row, i) => (
           <React.Fragment key={i}>
-            <div className={i === 0 ? "playerCard-row1" : "playerCard-row-white"}>
+            <div
+              className={i === 0 ? "playerCard-row1" : "playerCard-row-white"}
+            >
               {i + 1}
             </div>
             {i === 0 ? (
@@ -311,7 +329,9 @@ function TeamCard({
                 <div>{row.team.name}</div>
               </div>
             )}
-            <div className={i === 0 ? "playerCard-row1" : "playerCard-row-white"}>
+            <div
+              className={i === 0 ? "playerCard-row1" : "playerCard-row-white"}
+            >
               {row.val}
             </div>
           </React.Fragment>

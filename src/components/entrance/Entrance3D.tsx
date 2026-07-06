@@ -2,11 +2,14 @@
 
 import * as THREE from "three";
 import React, { Suspense, useEffect, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, type ThreeElements } from "@react-three/fiber";
 import { Text, useTexture, useGLTF, Html, Text3D, MeshReflectorMaterial } from "@react-three/drei";
 import Link from "next/link";
 
-const T3D = Text3D as any;
+type Text3DWithMaxWidthProps = React.ComponentProps<typeof Text3D> & {
+  maxWidth?: number;
+};
+const T3D = Text3D as unknown as React.ComponentType<Text3DWithMaxWidthProps>;
 
 export default function EntranceScene() {
   return (
@@ -27,13 +30,13 @@ export default function EntranceScene() {
             />
             <VideoText position={[0, 1.3, -2]} />
             <T3D maxWidth={1} font="/fonts/FZYaoTi_Regular.json" position={[0.3, 0.7, -1]} scale={0.1}>
-              一年一度的韭菜盛宴,除了"纯粹"还是"纯粹"
+              {'一年一度的韭菜盛宴,除了"纯粹"还是"纯粹"'}
             </T3D>
             <T3D maxWidth={1} font="/fonts/FZYaoTi_Regular.json" position={[0.3, 0.5, -1]} scale={0.08}>
               Annually Leek Cup, it was pure, all about money
             </T3D>
             <T3D maxWidth={1} font="/fonts/FZYaoTi_Regular.json" position={[0.3, 0.3, -1]} scale={0.1}>
-              "世界杯？狗都不看,"纯粹"的足球盛宴还得是韭菜杯"
+              {'"世界杯？狗都不看,"纯粹"的足球盛宴还得是韭菜杯"'}
             </T3D>
             <T3D maxWidth={1} font="/fonts/FZYaoTi_Regular.json" position={[0.3, 0.1, -1]} scale={0.08}>
               Bullshit World Cup, top soccer events only in the Leek Cup
@@ -58,12 +61,12 @@ export default function EntranceScene() {
   );
 }
 
-function Carla(props: any) {
+function Carla(props: ThreeElements["group"]) {
   const { scene } = useGLTF("/carla-draco.glb");
   return <primitive object={scene} {...props} />;
 }
 
-function VideoText(props: any) {
+function VideoText(props: Omit<React.ComponentProps<typeof Text>, "children">) {
   const [video] = useState(() =>
     Object.assign(document.createElement("video"), {
       src: "/reviewVideo.mp4",

@@ -13,10 +13,10 @@ export default function EntrancePage() {
         Back
       </Link> */}
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
-        2022-2023赛季 84452韭菜杯抽签仪式
+        2026-2027赛季 84452韭菜杯抽签仪式
       </h1>
       <h2 className="text-lg sm:text-xl text-white mt-2">
-        2022-2023 Season &nbsp;&nbsp;84452 LEEK CUP DRAW CEREMONY
+        2026-2027 Season &nbsp;&nbsp;84452 LEEK CUP DRAW CEREMONY
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 items-center justify-center mt-4 px-4">
@@ -67,6 +67,11 @@ export default function EntrancePage() {
           进入第四轮
           <br />
           Round 4
+        </Link>
+        <Link href="/teams" className="btn">
+          阵容
+          <br />
+          Teams
         </Link>
         <Link href="/review" className="btn">
           赛事回顾

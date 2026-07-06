@@ -1,15 +1,36 @@
 "use client";
 
 import * as THREE from "three";
-import { Suspense, useEffect, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Suspense, useEffect, useRef, useState, type ComponentProps, type ComponentType } from "react";
+import { Canvas, ThreeEvent, useFrame } from "@react-three/fiber";
 import { useCursor, MeshReflectorMaterial, Image, Environment, Text3D } from "@react-three/drei";
 import { useRouter, useParams } from "next/navigation";
 
-const T3D = Text3D as any;
 const GOLDENRATIO = 1.61803398875;
 
-const images = [
+type Text3DWithMaxWidthProps = ComponentProps<typeof Text3D> & {
+  maxWidth?: number;
+};
+const T3D = Text3D as unknown as ComponentType<Text3DWithMaxWidthProps>;
+
+interface FrameData {
+  position: [number, number, number];
+  rotation: [number, number, number];
+  url: string;
+  title: string;
+  Etitle: string;
+  name: string;
+  Ename: string;
+  score: string | null;
+  Escore: string | null;
+  number: string | null;
+}
+
+type ImageMesh = THREE.Mesh & {
+  material: THREE.Material & { zoom?: number };
+};
+
+const images: FrameData[] = [
   { position: [0, 0, 1.5], rotation: [0, 0, 0], url: "/images/AC.png", title: "卫冕冠军", Etitle: "Defending Champion", name: "AC米兰", Ename: "A.C. Milan", score: null, Escore: null, number: null },
   { position: [1, 0, 1], rotation: [0, 0, 0], url: "/images/MC.png", title: "亚军", Etitle: "Second Runner-up", name: "曼城", Ename: "Manchester City F.C.", score: null, Escore: null, number: null },
   { position: [-2.15, 0, 1.5], rotation: [0, Math.PI / 2.5, 0], url: "/images/cantona.jpg", title: "卫冕金靴", Etitle: "Golden Boot", name: "坎通纳", Ename: "Cantona", score: "进球数", Escore: "Goals", number: "11" },
@@ -45,40 +66,47 @@ export default function ScoreBoard3D() {
   );
 }
 
-function Frames({ images: imgs, q = new THREE.Quaternion(), p = new THREE.Vector3() }: any) {
-  const ref = useRef<any>(null);
-  const clicked = useRef<any>(null);
+function Frames({
+  images: imgs,
+  q = new THREE.Quaternion(),
+  p = new THREE.Vector3(),
+}: {
+  images: FrameData[];
+  q?: THREE.Quaternion;
+  p?: THREE.Vector3;
+}) {
+  const ref = useRef<THREE.Group>(null);
+  const clicked = useRef<THREE.Object3D | null>(null);
   const params = useParams();
   const slug = params.slug as string[] | undefined;
   const selectedId = slug?.[1];
   const router = useRouter();
   useEffect(() => {
-    clicked.current = ref.current?.getObjectByName(selectedId);
+    clicked.current = selectedId ? (ref.current?.getObjectByName(selectedId) ?? null) : null;
     if (clicked.current) {
-      clicked.current.parent.updateWorldMatrix(true, true);
-      clicked.current.parent.localToWorld(p.set(0, GOLDENRATIO / 2, 1.25));
-      clicked.current.parent.getWorldQuaternion(q);
+      clicked.current.parent?.updateWorldMatrix(true, true);
+      clicked.current.parent?.localToWorld(p.set(0, GOLDENRATIO / 2, 1.25));
+      clicked.current.parent?.getWorldQuaternion(q);
     } else {
       p.set(0, 0, 5.5);
       q.identity();
     }
   }, [selectedId, p, q]);
-  useFrame((state: any) => {
+  useFrame((state) => {
     state.camera.position.lerp(p, 0.025);
     state.camera.quaternion.slerp(q, 0.025);
   });
   return (
     <group
       ref={ref}
-      onClick={(e: any) => { e.stopPropagation(); router.push(clicked.current === e.object ? "/review" : "/review/item/" + e.object.name); }}
+      onClick={(e: ThreeEvent<MouseEvent>) => { e.stopPropagation(); router.push(clicked.current === e.object ? "/review" : "/review/item/" + e.object.name); }}
       onPointerMissed={() => router.push("/review")}
     >
-      {imgs.map((props: any) => <Frame key={props.url} {...props} />)}
+      {imgs.map((props) => <Frame key={props.url} {...props} />)}
     </group>
   );
 }
 
-let _uuidCounter = 0;
 function getSimpleUuid(s: string): string {
   let hash = 0;
   for (let i = 0; i < s.length; i++) {
@@ -88,25 +116,40 @@ function getSimpleUuid(s: string): string {
   return "frame-" + Math.abs(hash).toString(36);
 }
 
-function Frame({ url, c = new THREE.Color(), ...props }: any) {
+function Frame({
+  url,
+  c = new THREE.Color(),
+  position,
+  rotation,
+  title,
+  Etitle,
+  name: displayName,
+  Ename,
+  score,
+  Escore,
+  number,
+}: FrameData & { c?: THREE.Color }) {
   const [hovered, hover] = useState(false);
   const [rnd] = useState(() => Math.random());
-  const image = useRef<any>(null);
-  const frame = useRef<any>(null);
+  const image = useRef<ImageMesh>(null);
+  const frame = useRef<THREE.Mesh>(null);
   const name = getSimpleUuid(url);
   useCursor(hovered);
-  useFrame((state: any) => {
+  useFrame((state) => {
     if (!image.current?.material) return;
     image.current.material.zoom = 1 + Math.sin(rnd * 10000 + state.clock.elapsedTime / 3) / 2;
     image.current.scale.x = THREE.MathUtils.lerp(image.current.scale.x, 0.85 * (hovered ? 0.85 : 1), 0.1);
     image.current.scale.y = THREE.MathUtils.lerp(image.current.scale.y, 0.9 * (hovered ? 0.905 : 1), 0.1);
-    frame.current.material.color.lerp(c.set(hovered ? "orange" : "white"), 0.1);
+    const material = frame.current?.material;
+    if (material instanceof THREE.MeshBasicMaterial) {
+      material.color.lerp(c.set(hovered ? "orange" : "white"), 0.1);
+    }
   });
   return (
-    <group {...props}>
+    <group position={position} rotation={rotation}>
       <mesh
         name={name}
-        onPointerOver={(e: any) => { e.stopPropagation(); hover(true); }}
+        onPointerOver={(e: ThreeEvent<PointerEvent>) => { e.stopPropagation(); hover(true); }}
         onPointerOut={() => hover(false)}
         scale={[1, GOLDENRATIO, 0.05]}
         position={[0, GOLDENRATIO / 2, 0]}
@@ -117,34 +160,35 @@ function Frame({ url, c = new THREE.Color(), ...props }: any) {
           <boxGeometry />
           <meshBasicMaterial toneMapped={false} fog={false} />
         </mesh>
+        {/* eslint-disable-next-line jsx-a11y/alt-text */}
         <Image raycast={() => null} ref={image} position={[0, 0, 0.7]} url={url} />
       </mesh>
       <T3D maxWidth={0.1} font="/fonts/FZYaoTi_Regular.json" position={[0.55, GOLDENRATIO - 0.1, 0]} scale={0.1}>
-        {props.title}
+        {title}
         <meshNormalMaterial />
       </T3D>
       <T3D maxWidth={0.1} font="/fonts/FZYaoTi_Regular.json" position={[0.55, GOLDENRATIO - 0.2, 0]} scale={0.05}>
-        {props.Etitle}
+        {Etitle}
         <meshNormalMaterial />
       </T3D>
       <T3D maxWidth={0.1} font="/fonts/FZYaoTi_Regular.json" position={[0.55, GOLDENRATIO - 0.4, 0]} scale={0.1}>
-        {props.name}
+        {displayName}
         <meshNormalMaterial />
       </T3D>
       <T3D maxWidth={0.1} font="/fonts/FZYaoTi_Regular.json" position={[0.55, GOLDENRATIO - 0.5, 0]} scale={0.05}>
-        {props.Ename}
+        {Ename}
         <meshNormalMaterial />
       </T3D>
       <T3D maxWidth={0.1} font="/fonts/FZYaoTi_Regular.json" position={[0.55, GOLDENRATIO - 0.7, 0]} scale={0.1}>
-        {props.score}
+        {score}
         <meshNormalMaterial />
       </T3D>
       <T3D maxWidth={0.1} font="/fonts/FZYaoTi_Regular.json" position={[0.55, GOLDENRATIO - 0.8, 0]} scale={0.05}>
-        {props.Escore}
+        {Escore}
         <meshNormalMaterial />
       </T3D>
       <T3D maxWidth={0.1} font="/fonts/FZYaoTi_Regular.json" position={[1.05, GOLDENRATIO - 0.75, 0]} scale={0.1}>
-        {props.number}
+        {number}
         <meshNormalMaterial />
       </T3D>
     </group>

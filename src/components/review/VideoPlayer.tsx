@@ -15,7 +15,7 @@ const options = {
 
 export default function VideoPlayer() {
   const placeholderRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<any>(null);
+  const playerRef = useRef<ReturnType<typeof videojs> | null>(null);
 
   useEffect(() => {
     if (!playerRef.current && placeholderRef.current) {

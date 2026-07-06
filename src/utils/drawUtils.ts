@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { DrawState } from "@/types";
 
 export const rangeRam = (range: [number, number], count: number): number[] => {
@@ -34,10 +34,10 @@ const isElementInViewport = (el: Element): boolean => {
 export const scrollAnimate = (selector: string, animClass = "scale-in-hor-center"): void => {
   const scroll =
     window.requestAnimationFrame ||
-    (window as any).webkitRequestAnimationFrame ||
-    (window as any).mozRequestAnimationFrame ||
-    (window as any).msRequestAnimationFrame ||
-    (window as any).oRequestAnimationFrame ||
+    (window as Window & { webkitRequestAnimationFrame?: typeof requestAnimationFrame }).webkitRequestAnimationFrame ||
+    (window as Window & { mozRequestAnimationFrame?: typeof requestAnimationFrame }).mozRequestAnimationFrame ||
+    (window as Window & { msRequestAnimationFrame?: typeof requestAnimationFrame }).msRequestAnimationFrame ||
+    (window as Window & { oRequestAnimationFrame?: typeof requestAnimationFrame }).oRequestAnimationFrame ||
     function (callback: FrameRequestCallback) { window.setTimeout(callback, 1000 / 60); };
 
   const elementsToShow = document.querySelectorAll(selector);
@@ -57,7 +57,7 @@ export const scrollAnimate = (selector: string, animClass = "scale-in-hor-center
 };
 
 export const useDrawState = (size: number, infoPrefix: string): DrawState => {
-  const [randomArr, setRandomArr] = useState<number[]>([]);
+  const [randomArr, setRandomArr] = useState<number[]>(() => rangeRam([1, size], size));
   const [count, setCount] = useState(1);
   const [arr, setArr] = useState<number[]>([]);
   const [flag, setFlag] = useState(true);
@@ -90,10 +90,6 @@ export const useDrawState = (size: number, infoPrefix: string): DrawState => {
     setRandomArr(rangeRam([1, size], size));
     setFlag(true);
   };
-
-  useEffect(() => {
-    setRandomArr(rangeRam([1, size], size));
-  }, [size]);
 
   return { randomArr, count, arr, flag, handleDraw, handleReset };
 };
