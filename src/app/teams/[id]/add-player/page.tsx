@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import AddPlayerSearch from "@/components/teams/AddPlayerSearch";
 import { TEAMS2 } from "@/data/teams2";
 
 interface AddPlayerPageProps {
@@ -6,12 +7,14 @@ interface AddPlayerPageProps {
 }
 
 export function generateStaticParams() {
-  return Object.keys(TEAMS2).map((id) => ({ id }));
+  return Object.values(TEAMS2).map((team) => ({ id: team.sname }));
 }
 
 export default async function AddPlayerPage({ params }: AddPlayerPageProps) {
   const { id } = await params;
-  const team = TEAMS2[Number(id)];
+  const team = Object.values(TEAMS2).find(
+    (entry) => entry.sname === decodeURIComponent(id),
+  );
 
   if (!team) {
     notFound();
@@ -19,17 +22,7 @@ export default async function AddPlayerPage({ params }: AddPlayerPageProps) {
 
   return (
     <main className="add-player-page">
-      <section className="add-player-panel" aria-label={`${team.name} add player`}>
-        <input
-          className="add-player-search"
-          placeholder="Search Player"
-          type="search"
-        />
-        <button className="add-player-button" type="button">
-          <span>确认</span>
-          <span>Confirm</span>
-        </button>
-      </section>
+      <AddPlayerSearch teamName={team.name} teamSname={team.sname ?? id} />
     </main>
   );
 }

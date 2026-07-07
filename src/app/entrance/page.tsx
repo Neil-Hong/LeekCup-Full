@@ -4,19 +4,11 @@ import VideoPlayer from "@/components/review/VideoPlayer";
 export default function EntrancePage() {
   return (
     <div className="flex flex-col w-full text-center">
-      {/* <Link
-        href="/entrance"
-        className="fixed top-3 right-3 z-50 text-white text-sm bg-black/50 hover:bg-black/70 px-3 py-1.5 rounded-lg transition-colors no-underline border border-white/20"
-      >
-        返回
-        <br />
-        Back
-      </Link> */}
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
-        2026-2027赛季 84452韭菜杯抽签仪式
+        2026-2027赛季 84452韭菜杯
       </h1>
       <h2 className="text-lg sm:text-xl text-white mt-2">
-        2026-2027 Season &nbsp;&nbsp;84452 LEEK CUP DRAW CEREMONY
+        2026-2027 Season &nbsp;&nbsp;84452 LEEK CUP
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 items-center justify-center mt-4 px-4">
@@ -43,40 +35,35 @@ export default function EntrancePage() {
       </div>
 
       <div className="statics-container mt-6">
-        <Link href="/draw" className="btn">
-          开始抽签
-          <br />
-          Start
-        </Link>
-        <Link href="/round16" className="btn">
-          进入第二轮
-          <br />
-          Round 2
-        </Link>
-        <Link href="/round3" className="btn">
-          进入第三轮
-          <br />
-          Round 3
-        </Link>
-        <Link href="/stats" className="btn">
-          技术统计
-          <br />
-          Stats
-        </Link>
-        <Link href="/round4" className="btn">
-          进入第四轮
-          <br />
-          Round 4
-        </Link>
         <Link href="/teams" className="btn">
           阵容
           <br />
           Teams
         </Link>
-        <Link href="/review" className="btn">
-          赛事回顾
+        <Link href="/draw" className="btn">
+          开始抽签
           <br />
-          Match Review
+          Start
+        </Link>
+        {/* <Link href="/round16" className="btn">
+          进入第二轮
+          <br />
+          Round 2
+        </Link> */}
+        <Link href="/groupstage" className="btn">
+          进入小组赛
+          <br />
+          Group Stage
+        </Link>
+        <Link href="/groupstandings" className="btn">
+          小组实时积分
+          <br />
+          Group Standings
+        </Link>
+        <Link href="/stats" className="btn">
+          技术统计
+          <br />
+          Stats
         </Link>
       </div>
 

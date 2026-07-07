@@ -16,7 +16,7 @@ interface TeamsDashboardProps {
 export default function TeamsDashboard({ teams }: TeamsDashboardProps) {
   const router = useRouter();
   const gridRef = useRef<HTMLDivElement>(null);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedSname, setSelectedSname] = useState<string | null>(null);
 
   useEffect(() => {
     if (
@@ -75,24 +75,25 @@ export default function TeamsDashboard({ teams }: TeamsDashboardProps) {
     };
   }, []);
 
-  const openTeam = (teamId: number) => {
-    if (selectedId !== null) return;
+  const openTeam = (team: TeamEntry) => {
+    if (selectedSname !== null || !team.sname) return;
 
     const cards = Array.from(
       gridRef.current?.querySelectorAll<HTMLElement>(".team-dashboard-card") ??
         [],
     );
     const selectedCard = cards.find(
-      (card) => card.dataset.teamId === String(teamId),
+      (card) => card.dataset.teamSname === team.sname,
     );
+    const teamPath = `/teams/${encodeURIComponent(team.sname)}`;
 
-    setSelectedId(teamId);
+    setSelectedSname(team.sname);
 
     if (
       !selectedCard ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      router.push(`/teams/${teamId}`);
+      router.push(teamPath);
       return;
     }
 
@@ -100,7 +101,7 @@ export default function TeamsDashboard({ teams }: TeamsDashboardProps) {
     const viewportCenterY = window.innerHeight / 2;
     const tl = gsap.timeline({
       defaults: { ease: "power3.inOut" },
-      onComplete: () => router.push(`/teams/${teamId}`),
+      onComplete: () => router.push(teamPath),
     });
 
     tl.to(selectedCard, {
@@ -147,14 +148,15 @@ export default function TeamsDashboard({ teams }: TeamsDashboardProps) {
     <div className="teams-dashboard-grid" ref={gridRef}>
       {teams.map((team) => (
         <div
-          className={`team-dashboard-card ${selectedId === team.id ? "is-selected" : ""}`}
+          className={`team-dashboard-card ${selectedSname === team.sname ? "is-selected" : ""}`}
           data-team-id={team.id}
+          data-team-sname={team.sname}
           key={team.id}
-          onClick={() => openTeam(team.id)}
+          onClick={() => openTeam(team)}
           onKeyDown={(event) => {
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
-              openTeam(team.id);
+              openTeam(team);
             }
           }}
           role="button"
