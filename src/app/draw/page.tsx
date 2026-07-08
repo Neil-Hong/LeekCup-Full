@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { createPortal } from "react-dom";
 import ReactAudioPlayer from "react-audio-player";
 import { STAGE_1, STAGE_2 } from "@/data/teams";
 import { TEAMS2 } from "@/data/teams2";
@@ -186,19 +187,7 @@ export default function DrawPage() {
         </button>
       </div>
 
-      {showVideo && (
-        <div className="videoOverlay">
-          <video
-            controls={false}
-            autoPlay
-            muted
-            className="overlayVideo"
-            onEnded={finishVideo}
-          >
-            <source src="/video/drawVideo.mp4" type="video/mp4" />
-          </video>
-        </div>
-      )}
+      {showVideo && <DrawVideoOverlay onEnded={finishVideo} />}
 
       <div className="draw-groups">
         <DrawGroup
@@ -217,6 +206,23 @@ export default function DrawPage() {
 
       <div className="h-[150px]" />
     </div>
+  );
+}
+
+function DrawVideoOverlay({ onEnded }: { onEnded: () => void }) {
+  return createPortal(
+    <div className="videoOverlay">
+      <video
+        controls={false}
+        autoPlay
+        muted
+        className="overlayVideo"
+        onEnded={onEnded}
+      >
+        <source src="/video/drawVideo.mp4" type="video/mp4" />
+      </video>
+    </div>,
+    document.body,
   );
 }
 

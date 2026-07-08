@@ -282,8 +282,16 @@ main.site-auth-page {
   place-items: center;
   padding: 24px;
   background:
-    radial-gradient(circle at 50% 44%, rgba(14, 190, 255, 0.16), transparent 34%),
-    radial-gradient(circle at 18% 20%, rgba(64, 98, 255, 0.16), transparent 28%),
+    radial-gradient(
+      circle at 50% 44%,
+      rgba(14, 190, 255, 0.16),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 18% 20%,
+      rgba(64, 98, 255, 0.16),
+      transparent 28%
+    ),
     rgba(0, 0, 0, 0.72);
   backdrop-filter: blur(8px);
 }
@@ -314,7 +322,12 @@ form.site-auth-panel::before {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(120deg, transparent 0 42%, rgba(14, 190, 255, 0.1) 43%, transparent 54%),
+    linear-gradient(
+      120deg,
+      transparent 0 42%,
+      rgba(14, 190, 255, 0.1) 43%,
+      transparent 54%
+    ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 22%);
 }
 
