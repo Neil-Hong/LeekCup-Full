@@ -9,7 +9,7 @@ const teams = Object.entries(TEAMS2).map(([id, team]) => ({
 
 export default function TeamsPage() {
   return (
-    <div className="teams-page text-center">
+    <div className="teams-page groupstage-enterPage text-center">
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
         2026-2027赛季 84452韭菜杯
       </h1>

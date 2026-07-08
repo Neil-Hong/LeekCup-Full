@@ -31,45 +31,53 @@ export default function TeamsDashboard({ teams }: TeamsDashboardProps) {
 
     const context = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>(".team-dashboard-card");
-      const viewportCenterX = window.innerWidth / 2;
-      const viewportCenterY = window.innerHeight / 2;
-
-      gsap.fromTo(
-        cards,
-        {
-          autoAlpha: 0,
-          scale: 0.92,
-          x: (_, card) => {
-            const rect = card.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            return centerX < viewportCenterX ? -120 : 120;
-          },
-          y: (_, card) => {
-            const rect = card.getBoundingClientRect();
-            const centerY = rect.top + rect.height / 2;
-            return centerY < viewportCenterY ? -72 : 72;
-          },
-          rotation: (index) => (index % 2 === 0 ? -3 : 3),
-        },
-        {
-          autoAlpha: 1,
-          scale: 1,
-          x: 0,
-          y: 0,
-          rotation: 0,
-          duration: 0.95,
-          ease: "expo.out",
-          stagger: { amount: 0.32, from: "center" },
-          overwrite: "auto",
-          onComplete: () => {
-            gsap.set(cards, { clearProps: "transform,opacity,visibility" });
-            requestAnimationFrame(() => grid.classList.remove("is-entering"));
-          },
-        },
-      );
+      gsap.set(cards, { autoAlpha: 0 });
     }, gridRef);
 
+    const entryTimer = window.setTimeout(() => {
+      context.add(() => {
+        const cards = gsap.utils.toArray<HTMLElement>(".team-dashboard-card");
+        const viewportCenterX = window.innerWidth / 2;
+        const viewportCenterY = window.innerHeight / 2;
+
+        gsap.fromTo(
+          cards,
+          {
+            autoAlpha: 0,
+            scale: 0.92,
+            x: (_, card) => {
+              const rect = card.getBoundingClientRect();
+              const centerX = rect.left + rect.width / 2;
+              return centerX < viewportCenterX ? -120 : 120;
+            },
+            y: (_, card) => {
+              const rect = card.getBoundingClientRect();
+              const centerY = rect.top + rect.height / 2;
+              return centerY < viewportCenterY ? -72 : 72;
+            },
+            rotation: (index) => (index % 2 === 0 ? -3 : 3),
+          },
+          {
+            autoAlpha: 1,
+            scale: 1,
+            x: 0,
+            y: 0,
+            rotation: 0,
+            duration: 0.95,
+            ease: "expo.out",
+            stagger: { amount: 0.32, from: "center" },
+            overwrite: "auto",
+            onComplete: () => {
+              gsap.set(cards, { clearProps: "transform,opacity,visibility" });
+              requestAnimationFrame(() => grid.classList.remove("is-entering"));
+            },
+          },
+        );
+      });
+    }, 760);
+
     return () => {
+      window.clearTimeout(entryTimer);
       grid.classList.remove("is-entering");
       context.revert();
     };

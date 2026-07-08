@@ -81,7 +81,7 @@ export default function StatsClient({
   }, []);
 
   return (
-    <div className="stats text-center">
+    <div className="stats groupstage-enterPage text-center">
       <BackBtn />
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
         2026-2027赛季 84452韭菜杯实时数据

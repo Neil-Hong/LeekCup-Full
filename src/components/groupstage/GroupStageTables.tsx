@@ -13,33 +13,38 @@ export default function GroupStageTables({
   groupB,
   resultBySlug,
 }: GroupStageTablesProps) {
+  const groupAMatches = buildSingleRoundRobin("GroupA", groupA);
+  const groupBMatches = buildSingleRoundRobin("GroupB", groupB);
+
   return (
     <div className="groupstage-tables">
       <GroupStageTable
+        matches={groupAMatches}
         resultBySlug={resultBySlug}
         title="GroupA"
-        teams={groupA}
+        startIndex={0}
       />
       <GroupStageTable
+        matches={groupBMatches}
         resultBySlug={resultBySlug}
         title="GroupB"
-        teams={groupB}
+        startIndex={groupAMatches.length}
       />
     </div>
   );
 }
 
 function GroupStageTable({
+  matches,
   title,
-  teams,
   resultBySlug,
+  startIndex,
 }: {
+  matches: ReturnType<typeof buildSingleRoundRobin>;
   resultBySlug: Record<string, GroupMatchResultRow>;
   title: "GroupA" | "GroupB";
-  teams: GroupTeamRow[];
+  startIndex: number;
 }) {
-  const matches = buildSingleRoundRobin(title, teams);
-
   return (
     <section className="groupstage-table">
       <h3>{title}</h3>
@@ -50,6 +55,7 @@ function GroupStageTable({
               key={`${title}-${match.round}-${index}`}
               match={match}
               result={resultBySlug[match.slug]}
+              sequenceIndex={startIndex + index}
             />
           ))}
         </div>
@@ -66,14 +72,17 @@ function GroupStageTable({
 function MatchRow({
   match,
   result,
+  sequenceIndex,
 }: {
   match: ReturnType<typeof buildSingleRoundRobin>[number];
   result?: GroupMatchResultRow;
+  sequenceIndex: number;
 }) {
   return (
     <Link
       className="groupstage-match-row"
       href={`/groupstage/${encodeURIComponent(match.slug)}`}
+      style={{ animationDelay: `${760 + sequenceIndex * 70}ms` }}
     >
       <span className="groupstage-round">R{match.round}</span>
       <TeamCell team={match.home} />

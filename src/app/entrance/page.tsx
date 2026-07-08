@@ -21,7 +21,7 @@ export default function EntrancePage() {
         </div>
         <div>
           <h3 className="text-sm text-white/70">
-            数据&视频来源: 鱼吧用户M1Nmin <br />
+            视频来源: 鱼吧用户M1Nmin <br />
             若侵删
           </h3>
           <h3 className="text-sm text-white/70">
@@ -54,6 +54,11 @@ export default function EntrancePage() {
           进入小组赛
           <br />
           Group Stage
+        </Link>
+        <Link href="/group-playoffs" className="btn">
+          进入小组附加赛
+          <br />
+          Group Play-off Stage
         </Link>
         <Link href="/groupstandings" className="btn">
           小组实时积分

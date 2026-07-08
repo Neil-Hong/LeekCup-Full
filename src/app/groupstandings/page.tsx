@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { buildGroupStandings, type GroupStandingRow } from "@/lib/groupStage";
+import {
+  buildGroupPlayoffMatches,
+  buildGroupStandings,
+  type GroupStandingRow,
+} from "@/lib/groupStage";
 import { readGroupMatchResults, readGroupTable } from "@/lib/supabaseRest";
 
 export const dynamic = "force-dynamic";
@@ -12,9 +16,16 @@ export default async function GroupStandingsPage() {
   ]);
   const groupAStandings = buildGroupStandings("GroupA", groupA, results);
   const groupBStandings = buildGroupStandings("GroupB", groupB, results);
+  const groupStageResultCount = results.filter(
+    (result) => result.group_name === "GroupA" || result.group_name === "GroupB",
+  ).length;
+  const isGroupStageComplete = groupStageResultCount >= 56;
+  const playoffMatches = isGroupStageComplete
+    ? buildGroupPlayoffMatches(groupAStandings, groupBStandings)
+    : [];
 
   return (
-    <main className="groupstage-page groupstandings-page text-center">
+    <main className="groupstage-page groupstage-enterPage groupstandings-page text-center">
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
         2026-2027赛季 84452韭菜杯小组实时排名
       </h1>
@@ -34,9 +45,25 @@ export default async function GroupStandingsPage() {
       </div>
 
       <div className="groupstandings-tables">
-        <StandingsTable rows={groupAStandings} title="Group A Standings" />
-        <StandingsTable rows={groupBStandings} title="Group B Standings" />
+        <StandingsTable
+          rows={groupAStandings}
+          startIndex={0}
+          title="Group A Standings"
+        />
+        <StandingsTable
+          rows={groupBStandings}
+          startIndex={groupAStandings.length}
+          title="Group B Standings"
+        />
       </div>
+
+      <PlayOffTable
+        groupAStandings={groupAStandings}
+        groupBStandings={groupBStandings}
+        href={playoffMatches.length > 0 ? "/group-playoffs" : "#"}
+        isReady={isGroupStageComplete}
+        startIndex={groupAStandings.length + groupBStandings.length}
+      />
     </main>
   );
 }
@@ -55,9 +82,11 @@ function getStandingClass(index: number, total: number) {
 
 function StandingsTable({
   rows,
+  startIndex,
   title,
 }: {
   rows: GroupStandingRow[];
+  startIndex: number;
   title: string;
 }) {
   return (
@@ -74,6 +103,7 @@ function StandingsTable({
             <div
               className={`groupstandings-row${getStandingClass(index, rows.length)}`}
               key={row.team.sname}
+              style={{ animationDelay: `${760 + (startIndex + index) * 70}ms` }}
             >
               <span className="groupstandings-no">{index + 1}</span>
               <div className="groupstandings-team">
@@ -88,5 +118,112 @@ function StandingsTable({
         <div className="groupstage-empty">No confirmed group yet.</div>
       )}
     </section>
+  );
+}
+
+function getPlayoffTeam(
+  rows: GroupStandingRow[],
+  position: number,
+  isReady: boolean,
+) {
+  if (!isReady) {
+    return null;
+  }
+
+  return rows[position - 1] ?? null;
+}
+
+function PlayOffTable({
+  groupAStandings,
+  groupBStandings,
+  href,
+  isReady,
+  startIndex,
+}: {
+  groupAStandings: GroupStandingRow[];
+  groupBStandings: GroupStandingRow[];
+  href: string;
+  isReady: boolean;
+  startIndex: number;
+}) {
+  const pairings = [
+    {
+      leftLabel: "A4",
+      leftTeam: getPlayoffTeam(groupAStandings, 4, isReady),
+      rightLabel: "B7",
+      rightTeam: getPlayoffTeam(groupBStandings, 7, isReady),
+    },
+    {
+      leftLabel: "B4",
+      leftTeam: getPlayoffTeam(groupBStandings, 4, isReady),
+      rightLabel: "A7",
+      rightTeam: getPlayoffTeam(groupAStandings, 7, isReady),
+    },
+    {
+      leftLabel: "A5",
+      leftTeam: getPlayoffTeam(groupAStandings, 5, isReady),
+      rightLabel: "B6",
+      rightTeam: getPlayoffTeam(groupBStandings, 6, isReady),
+    },
+    {
+      leftLabel: "B5",
+      leftTeam: getPlayoffTeam(groupBStandings, 5, isReady),
+      rightLabel: "A6",
+      rightTeam: getPlayoffTeam(groupAStandings, 6, isReady),
+    },
+  ];
+
+  return (
+    <section className="groupplayoff-table">
+      <h3>
+        <span>小组附加赛</span>
+        <span>Group Play-offs</span>
+      </h3>
+      <div className="groupplayoff-list">
+        {pairings.map((pairing, index) => (
+          <div
+            className="groupplayoff-row"
+            key={`${pairing.leftLabel}-${pairing.rightLabel}`}
+            style={{ animationDelay: `${760 + (startIndex + index) * 70}ms` }}
+          >
+            <PlayOffTeamCell label={pairing.leftLabel} row={pairing.leftTeam} />
+            <span className="groupplayoff-versus">VS</span>
+            <PlayOffTeamCell
+              align="right"
+              label={pairing.rightLabel}
+              row={pairing.rightTeam}
+            />
+          </div>
+        ))}
+      </div>
+      <Link
+        aria-disabled={!isReady}
+        className={`groupplayoff-enterButton${isReady ? "" : " is-disabled"}`}
+        href={href}
+      >
+        <span>进入小组附加赛</span>
+        <span>Group Play-offs</span>
+      </Link>
+    </section>
+  );
+}
+
+function PlayOffTeamCell({
+  align = "left",
+  label,
+  row,
+}: {
+  align?: "left" | "right";
+  label: string;
+  row: GroupStandingRow | null;
+}) {
+  const team = row?.team;
+
+  return (
+    <div className={`groupplayoff-team is-${align}`}>
+      <span className="groupplayoff-seed">{label}</span>
+      <img src={team?.img ?? "/images/Question.png"} alt={team?.name ?? "TBD"} />
+      <span>{team?.name ?? "TBD"}</span>
+    </div>
   );
 }

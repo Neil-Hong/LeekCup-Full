@@ -1,36 +1,37 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import GroupMatchResultForm from "@/components/groupstage/GroupMatchResultForm";
-import { buildSingleRoundRobin } from "@/lib/groupStage";
+import { buildGroupPlayoffMatches, buildGroupStandings } from "@/lib/groupStage";
 import {
   readGroupMatchPlayerStats,
   readGroupMatchResult,
+  readGroupMatchResults,
   readGroupTable,
   readSelectedPlayersForTeam,
 } from "@/lib/supabaseRest";
 
 export const dynamic = "force-dynamic";
 
-interface GroupStageMatchPageProps {
+interface GroupPlayoffMatchPageProps {
   params: Promise<{ match: string }>;
 }
 
-export default async function GroupStageMatchPage({
+export default async function GroupPlayoffMatchPage({
   params,
-}: GroupStageMatchPageProps) {
+}: GroupPlayoffMatchPageProps) {
   const { match } = await params;
   const decodedMatch = decodeURIComponent(match);
-  const [groupA, groupB] = await Promise.all([
+  const [groupA, groupB, results] = await Promise.all([
     readGroupTable("GroupA"),
     readGroupTable("GroupB"),
+    readGroupMatchResults(),
   ]);
-  const matches = [
-    ...buildSingleRoundRobin("GroupA", groupA),
-    ...buildSingleRoundRobin("GroupB", groupB),
-  ];
+  const groupAStandings = buildGroupStandings("GroupA", groupA, results);
+  const groupBStandings = buildGroupStandings("GroupB", groupB, results);
+  const matches = buildGroupPlayoffMatches(groupAStandings, groupBStandings);
   const currentMatch = matches.find((entry) => entry.slug === decodedMatch);
 
-  if (!currentMatch) {
+  if (!currentMatch || results.length < 56) {
     notFound();
   }
 
@@ -46,15 +47,15 @@ export default async function GroupStageMatchPage({
       <div className="groupmatch-titleRow">
         <div className="groupmatch-titleText">
       <h1 className="text-2xl sm:text-3xl text-white font-bold">
-        2026-2027赛季 84452韭菜杯小组赛
+        小组附加赛
       </h1>
       <h2 className="text-lg sm:text-xl text-white mt-2">
-        {currentMatch.group} &nbsp;&nbsp; Round {currentMatch.round}
+        Group Play-offs &nbsp;&nbsp; Match {currentMatch.index + 1}
       </h2>
         </div>
-        <Link href="/groupstage" className="groupstage-actionButton groupmatch-topBack">
-          <span>返回小组对阵</span>
-          <span>Back to Group Stage</span>
+        <Link href="/group-playoffs" className="groupstage-actionButton groupmatch-topBack">
+          <span>返回小组附加赛</span>
+          <span>Back to Play-offs</span>
         </Link>
       </div>
 

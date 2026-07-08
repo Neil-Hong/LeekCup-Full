@@ -45,7 +45,7 @@ export default function EntranceScene() {
               感谢雪儿后援会自立三群鼎力支持
             </T3D>
             <Html>
-              <Link href="/entrance" className="drawButton">
+              <Link href="/entrance" className="drawButton" prefetch={false}>
                 开始<br />Start
               </Link>
             </Html>

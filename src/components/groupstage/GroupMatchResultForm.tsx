@@ -118,11 +118,13 @@ export default function GroupMatchResultForm({
         <MatchRosterTable
           matchStatsByPlayerKey={matchStatsByPlayerKey}
           players={homePlayers}
+          startIndex={0}
           title={match.home.name}
         />
         <MatchRosterTable
           matchStatsByPlayerKey={matchStatsByPlayerKey}
           players={awayPlayers}
+          startIndex={homePlayers.length}
           title={match.away.name}
         />
       </div>
@@ -142,10 +144,12 @@ function MatchTeamHeader({ img, name }: { img: string; name: string }) {
 function MatchRosterTable({
   matchStatsByPlayerKey,
   players,
+  startIndex,
   title,
 }: {
   matchStatsByPlayerKey: Map<string, GroupMatchPlayerStatRow>;
   players: MatchPlayerRow[];
+  startIndex: number;
   title: string;
 }) {
   return (
@@ -160,11 +164,15 @@ function MatchRosterTable({
             <span>Goal</span>
             <span>Assist</span>
           </div>
-          {players.map((player) => {
+          {players.map((player, index) => {
             const matchStat = matchStatsByPlayerKey.get(player.player_key);
 
             return (
-              <div className="groupmatch-player-row" key={player.player_key}>
+              <div
+                className="groupmatch-player-row"
+                key={player.player_key}
+                style={{ animationDelay: `${760 + (startIndex + index) * 70}ms` }}
+              >
                 <div className="groupmatch-player-cell">
                   {player.avatar_url && (
                     <img src={player.avatar_url} alt={player.name} />

@@ -8,7 +8,7 @@ import {
 interface GroupStageResultPayload {
   awayScore?: number;
   awaySname?: string;
-  groupName?: "GroupA" | "GroupB";
+  groupName?: "GroupA" | "GroupB" | "GroupPlayoffs";
   homeScore?: number;
   homeSname?: string;
   matchSlug?: string;
@@ -42,7 +42,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid team." }, { status: 400 });
     }
 
-    if (payload.groupName !== "GroupA" && payload.groupName !== "GroupB") {
+    if (
+      payload.groupName !== "GroupA" &&
+      payload.groupName !== "GroupB" &&
+      payload.groupName !== "GroupPlayoffs"
+    ) {
       return NextResponse.json({ error: "Invalid group." }, { status: 400 });
     }
 

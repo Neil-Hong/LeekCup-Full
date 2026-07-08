@@ -1,7 +1,17 @@
 export const AUTH_COOKIE_NAME = "leekcup_auth";
 
 export function getSiteEnv() {
-  return (process.env.ENV ?? process.env.SITE_ENV ?? "DEV").trim().toUpperCase();
+  const explicitEnv = process.env.ENV ?? process.env.SITE_ENV;
+
+  if (explicitEnv) {
+    return explicitEnv.trim().toUpperCase();
+  }
+
+  if (process.env.VERCEL_ENV === "production") {
+    return "PROD";
+  }
+
+  return "DEV";
 }
 
 export function isProdSite() {

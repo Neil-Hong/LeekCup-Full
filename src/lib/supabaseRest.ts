@@ -44,7 +44,7 @@ export interface MatchPlayerRow extends TeamPlayerRow {
 
 export interface GroupMatchResultRow {
   match_slug: string;
-  group_name: "GroupA" | "GroupB";
+  group_name: "GroupA" | "GroupB" | "GroupPlayoffs";
   round: number;
   home_sname: string;
   away_sname: string;
@@ -638,7 +638,7 @@ export async function saveGroupStageResult({
 }: {
   awayScore: number;
   awaySname: string;
-  groupName: "GroupA" | "GroupB";
+  groupName: "GroupA" | "GroupB" | "GroupPlayoffs";
   homeScore: number;
   homeSname: string;
   matchSlug: string;

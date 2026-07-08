@@ -141,7 +141,7 @@ export default function DrawPage() {
   };
 
   return (
-    <div className="drawPageContainer text-center">
+    <div className="drawPageContainer groupstage-enterPage text-center">
       <BackButton />
       <ReactAudioPlayer src="/audio/theme.mp3" autoPlay loop volume={0.3} />
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">

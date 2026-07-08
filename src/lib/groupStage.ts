@@ -1,8 +1,10 @@
 import type { GroupTeamRow } from "@/lib/supabaseRest";
 import type { GroupMatchResultRow } from "@/lib/supabaseRest";
 
+export type GroupName = "GroupA" | "GroupB" | "GroupPlayoffs";
+
 export interface GroupMatch {
-  group: "GroupA" | "GroupB";
+  group: GroupName;
   round: number;
   index: number;
   home: GroupTeamRow;
@@ -17,7 +19,7 @@ export interface GroupStandingRow {
 }
 
 export function createMatchSlug(
-  group: "GroupA" | "GroupB",
+  group: GroupName,
   round: number,
   index: number,
   homeSname: string,
@@ -33,7 +35,12 @@ export function parseMatchSlug(slug: string) {
     return null;
   }
 
-  const group = parts[0] === "GroupA" || parts[0] === "GroupB" ? parts[0] : null;
+  const group =
+    parts[0] === "GroupA" ||
+    parts[0] === "GroupB" ||
+    parts[0] === "GroupPlayoffs"
+      ? parts[0]
+      : null;
   const round = Number(parts[1]?.replace(/^R/, ""));
   const index = Number(parts[2]?.replace(/^M/, "")) - 1;
   const vsIndex = parts.indexOf("vs");
@@ -142,5 +149,40 @@ export function buildGroupStandings(
     }
 
     return first.team.name.localeCompare(second.team.name);
+  });
+}
+
+export function buildGroupPlayoffMatches(
+  groupAStandings: GroupStandingRow[],
+  groupBStandings: GroupStandingRow[],
+) {
+  const pairings = [
+    [groupAStandings[3]?.team, groupBStandings[6]?.team],
+    [groupBStandings[3]?.team, groupAStandings[6]?.team],
+    [groupAStandings[4]?.team, groupBStandings[5]?.team],
+    [groupBStandings[4]?.team, groupAStandings[5]?.team],
+  ];
+
+  return pairings.flatMap(([home, away], index) => {
+    if (!home || !away) {
+      return [];
+    }
+
+    return [
+      {
+        group: "GroupPlayoffs" as const,
+        round: 1,
+        index,
+        home,
+        away,
+        slug: createMatchSlug(
+          "GroupPlayoffs",
+          1,
+          index,
+          home.sname,
+          away.sname,
+        ),
+      },
+    ];
   });
 }
