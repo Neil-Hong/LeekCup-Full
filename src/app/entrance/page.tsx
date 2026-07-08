@@ -71,6 +71,11 @@ export default function EntrancePage() {
           <br />
           Stats
         </Link>
+        <Link href="/knockoutstage" className="btn">
+          进入淘汰赛
+          <br />
+          Knockout Stage
+        </Link>
         <ResetAllButton className="btn" />
       </div>
 
