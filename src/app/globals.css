@@ -1694,6 +1694,7 @@ form.site-auth-panel > * {
   margin-bottom: 20px;
   border-radius: 10px;
   border: 0;
+  appearance: none;
   text-align: center;
   align-items: center;
   padding-top: 8px;
@@ -1702,6 +1703,7 @@ form.site-auth-panel > * {
   background: transparent;
   font-family: "Quintessential", cursive;
   font-size: 20px;
+  line-height: 1.2;
   overflow: hidden;
   cursor: pointer;
   transition: 0.3s;
@@ -1711,6 +1713,8 @@ form.site-auth-panel > * {
 }
 
 .statics-container button.btn span {
+  position: relative;
+  z-index: 1;
   display: block;
 }
 
@@ -1719,7 +1723,7 @@ form.site-auth-panel > * {
   opacity: 0.65;
 }
 
-.statics-container .btn:hover {
+.statics-container .btn:not(:disabled):hover {
   color: #fff;
   box-shadow:
     0 0 5px #0ebeff,
@@ -1755,8 +1759,8 @@ form.site-auth-panel > * {
   border-radius: 10px;
 }
 
-.statics-container .btn:hover::after,
-.statics-container .btn:hover::before {
+.statics-container .btn:not(:disabled):hover::after,
+.statics-container .btn:not(:disabled):hover::before {
   transition: 0.3s;
   background: #0ebeff;
 }
