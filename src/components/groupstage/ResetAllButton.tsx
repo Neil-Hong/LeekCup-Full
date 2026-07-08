@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function ResetAllButton({
-  className = "groupstage-actionButton",
+  className = "statics-container btn",
 }: {
   className?: string;
 }) {
