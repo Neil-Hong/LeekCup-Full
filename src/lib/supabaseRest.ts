@@ -1,3 +1,5 @@
+import { TEAMS2 } from "@/data/teams2";
+
 export interface GroupTeamRow {
   position_order: number;
   team_id: number;
@@ -1035,4 +1037,109 @@ export async function removeAllPlayersFromTeam(teamSname: string) {
       }
     }),
   );
+}
+
+async function deleteRows({
+  ignoreMissing = false,
+  tableName,
+  where,
+}: {
+  ignoreMissing?: boolean;
+  tableName: string;
+  where: string;
+}) {
+  const { restUrl } = getSupabaseServerConfig();
+  const response = await fetch(
+    `${restUrl}/${encodeURIComponent(tableName)}?${where}`,
+    {
+      method: "DELETE",
+      headers: {
+        ...apiHeaders(),
+        Prefer: "return=minimal",
+      },
+    },
+  );
+
+  if (!response.ok) {
+    const message = await response.text();
+
+    if (ignoreMissing) {
+      return;
+    }
+
+    throw new Error(`Failed to clear ${tableName}: ${message}`);
+  }
+}
+
+async function patchRows({
+  body,
+  tableName,
+  where,
+}: {
+  body: Record<string, unknown>;
+  tableName: string;
+  where: string;
+}) {
+  const { restUrl } = getSupabaseServerConfig();
+  const response = await fetch(
+    `${restUrl}/${encodeURIComponent(tableName)}?${where}`,
+    {
+      method: "PATCH",
+      headers: {
+        ...apiHeaders(),
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(body),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Failed to reset ${tableName}: ${await response.text()}`);
+  }
+}
+
+export async function resetAllTournamentData() {
+  const teamTables = Object.values(TEAMS2)
+    .map((team) => team.sname)
+    .filter((sname): sname is string => Boolean(sname));
+
+  await Promise.all([
+    patchRows({
+      body: {
+        budget: 100000000,
+        conceded: 0,
+        goals: 0,
+      },
+      tableName: "teams",
+      where: "sname=not.is.null",
+    }),
+    patchRows({
+      body: { isSelected: false },
+      tableName: "fc26_players",
+      where: "player_key=not.is.null",
+    }),
+  ]);
+
+  await Promise.all([
+    deleteRows({ tableName: "selectedPlayer", where: "player_key=not.is.null" }),
+    deleteRows({
+      tableName: "groupMatchResults",
+      where: "match_slug=not.is.null",
+    }),
+    deleteRows({
+      tableName: "groupMatchPlayerStats",
+      where: "match_slug=not.is.null",
+    }),
+    deleteRows({
+      ignoreMissing: true,
+      tableName: "groupMatchPlayerStatus",
+      where: "match_slug=not.is.null",
+    }),
+    deleteRows({ tableName: "GroupA", where: "position_order=not.is.null" }),
+    deleteRows({ tableName: "GroupB", where: "position_order=not.is.null" }),
+    ...teamTables.map((tableName) =>
+      deleteRows({ tableName, where: "player_key=not.is.null" }),
+    ),
+  ]);
 }

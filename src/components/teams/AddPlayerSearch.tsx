@@ -100,6 +100,16 @@ export default function AddPlayerSearch({
   const confirmPlayer = async () => {
     if (!selectedPlayer || isConfirming) return;
 
+    const transactionPriceMillions = Number(transactionPrice || 0);
+
+    if (
+      !Number.isFinite(transactionPriceMillions) ||
+      transactionPriceMillions < 0
+    ) {
+      setErrorMessage("Invalid transaction price.");
+      return;
+    }
+
     setIsConfirming(true);
     setErrorMessage("");
 
@@ -111,7 +121,7 @@ export default function AddPlayerSearch({
       body: JSON.stringify({
         teamSname,
         player: selectedPlayer,
-        transactionPrice: Number(transactionPrice || 0),
+        transactionPrice: Math.round(transactionPriceMillions * 1000000),
       }),
     });
 
@@ -218,12 +228,14 @@ export default function AddPlayerSearch({
         <span>成交价</span>
         <span>Transaction Price</span>
         <input
+          aria-label="Transaction price in millions"
           inputMode="numeric"
           min="0"
           onChange={(event) => setTransactionPrice(event.target.value)}
           type="number"
           value={transactionPrice}
         />
+        <span className="add-player-priceUnit">M</span>
       </label>
 
       {errorMessage && <div className="add-player-error">{errorMessage}</div>}

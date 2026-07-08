@@ -72,6 +72,7 @@ video {
   margin: 0;
   font-size: 34px;
   font-weight: 900;
+  font-family: inherit;
   line-height: 1;
 }
 
@@ -181,11 +182,13 @@ video {
   width: 160px;
   height: 80px;
   border-radius: 10px;
+  border: 0;
   text-align: center;
   align-items: center;
   padding-top: 8px;
   text-decoration: none;
   color: #0ebeff;
+  background: transparent;
   font-family: "Quintessential", cursive;
   font-size: 20px;
   overflow: hidden;
@@ -759,6 +762,12 @@ form.site-auth-panel > * {
 .groupstage-actionButton span:last-child {
   color: #0ebeff;
   font-size: 13px;
+}
+
+.groupstage-actionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
 }
 
 .groupstage-actionButton:hover,
@@ -1684,11 +1693,13 @@ form.site-auth-panel > * {
   margin-top: 20px;
   margin-bottom: 20px;
   border-radius: 10px;
+  border: 0;
   text-align: center;
   align-items: center;
   padding-top: 8px;
   text-decoration: none;
   color: #0ebeff;
+  background: transparent;
   font-family: "Quintessential", cursive;
   font-size: 20px;
   overflow: hidden;
@@ -1697,6 +1708,15 @@ form.site-auth-panel > * {
   -webkit-box-reflect: below 10px
     linear-gradient(transparent, rgba(0, 0, 0, 0.4));
   display: inline-block;
+}
+
+.statics-container button.btn span {
+  display: block;
+}
+
+.statics-container .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 
 .statics-container .btn:hover {
@@ -1924,8 +1944,10 @@ form.site-auth-panel > * {
   min-width: 160px;
   min-height: 52px;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   margin: 0;
   color: white;
   background:
@@ -1942,6 +1964,11 @@ form.site-auth-panel > * {
     border-color 0.22s ease,
     box-shadow 0.22s ease,
     transform 0.22s ease;
+}
+
+.team-detail-navButton span:last-child {
+  color: #0ebeff;
+  font-size: 13px;
 }
 
 .team-detail-navButton:hover,
@@ -2797,6 +2824,7 @@ form.site-auth-panel > * {
 
 .add-player-priceWrap {
   width: 100%;
+  position: relative;
   display: grid;
   grid-template-columns: minmax(120px, 0.55fr) minmax(0, 1fr);
   align-items: center;
@@ -2828,11 +2856,22 @@ form.site-auth-panel > * {
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(14, 190, 255, 0.72);
   border-radius: 8px;
-  padding: 0 18px;
+  padding: 0 48px 0 18px;
   font-size: 18px;
   font-weight: 800;
   outline: none;
   box-shadow: inset 0 0 18px rgba(14, 190, 255, 0.12);
+}
+
+.add-player-priceUnit {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  justify-self: end;
+  padding-right: 18px;
+  color: white;
+  font-size: 20px;
+  font-weight: 900;
+  pointer-events: none;
 }
 
 .add-player-priceWrap input:focus {
@@ -3321,8 +3360,12 @@ form.site-auth-panel > * {
     grid-template-columns: 1fr;
   }
   .add-player-priceWrap > span:nth-child(2),
-  .add-player-priceWrap input {
+  .add-player-priceWrap input,
+  .add-player-priceUnit {
     grid-column: 1;
     grid-row: auto;
+  }
+  .add-player-priceUnit {
+    grid-row: 3;
   }
 }

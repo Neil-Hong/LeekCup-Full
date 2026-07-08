@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ResetAllButton from "@/components/groupstage/ResetAllButton";
 import VideoPlayer from "@/components/review/VideoPlayer";
 
 export default function EntrancePage() {
@@ -70,6 +71,7 @@ export default function EntrancePage() {
           <br />
           Stats
         </Link>
+        <ResetAllButton className="btn" />
       </div>
 
       <div className="h-[150px]" />

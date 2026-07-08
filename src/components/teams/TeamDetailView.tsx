@@ -22,14 +22,14 @@ function formatBudgetMillions(value: number) {
 }
 
 function formatPrice(value: number) {
-  if (value >= 1000000) {
-    const millions = value / 1000000;
-    return Number.isInteger(millions)
-      ? `${millions}M`
-      : `${millions.toFixed(1)}M`;
+  if (value > 0 && value < 1000000) {
+    return `${value}M`;
   }
 
-  return String(value);
+  const millions = value / 1000000;
+  return Number.isInteger(millions)
+    ? `${millions}M`
+    : `${millions.toFixed(1)}M`;
 }
 
 export default function TeamDetailView({
@@ -181,7 +181,8 @@ export default function TeamDetailView({
   return (
     <div className="team-detail-shell" ref={panelRef}>
       <Link href="/teams" className="team-detail-navButton">
-        Back to Teams
+        <span>返回阵容</span>
+        <span>Back to Teams</span>
       </Link>
 
       <div className="team-detail-summary">
