@@ -1,14 +1,18 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import {
   buildGroupPlayoffMatches,
   buildGroupStandings,
   type GroupStandingRow,
 } from "@/lib/groupStage";
+import { isAdminSite } from "@/lib/siteAuth";
 import { readGroupMatchResults, readGroupTable } from "@/lib/supabaseRest";
 
 export const dynamic = "force-dynamic";
 
 export default async function GroupStandingsPage() {
+  const headerStore = await headers();
+  const canManage = isAdminSite(headerStore.get("host"));
   const [groupA, groupB, results] = await Promise.all([
     readGroupTable("GroupA"),
     readGroupTable("GroupB"),
@@ -62,6 +66,7 @@ export default async function GroupStandingsPage() {
         groupBStandings={groupBStandings}
         href={playoffMatches.length > 0 ? "/group-playoffs" : "#"}
         isReady={isGroupStageComplete}
+        canManage={canManage}
         startIndex={groupAStandings.length + groupBStandings.length}
       />
     </main>
@@ -138,12 +143,14 @@ function PlayOffTable({
   groupBStandings,
   href,
   isReady,
+  canManage,
   startIndex,
 }: {
   groupAStandings: GroupStandingRow[];
   groupBStandings: GroupStandingRow[];
   href: string;
   isReady: boolean;
+  canManage: boolean;
   startIndex: number;
 }) {
   const pairings = [
@@ -196,6 +203,7 @@ function PlayOffTable({
           </div>
         ))}
       </div>
+      {canManage ? (
       <Link
         aria-disabled={!isReady}
         className={`groupplayoff-enterButton${isReady ? "" : " is-disabled"}`}
@@ -204,6 +212,7 @@ function PlayOffTable({
         <span>进入小组附加赛</span>
         <span>Group Play-offs</span>
       </Link>
+      ) : null}
     </section>
   );
 }

@@ -1,7 +1,12 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import LoginForm from "@/components/auth/LoginForm";
 import HomeEntrance from "@/components/entrance/HomeEntrance";
-import { AUTH_COOKIE_NAME, isProdSite, isValidAuthToken } from "@/lib/siteAuth";
+import {
+  AUTH_COOKIE_NAME,
+  isAdminSite,
+  isProdSite,
+  isValidAuthToken,
+} from "@/lib/siteAuth";
 
 type HomeProps = {
   searchParams: Promise<{
@@ -24,15 +29,23 @@ export default async function Home({ searchParams }: HomeProps) {
   }
 
   const params = await searchParams;
+  const headerStore = await headers();
+
+  if (!isAdminSite(headerStore.get("host"))) {
+    return <HomeEntrance />;
+  }
+
   const cookieStore = await cookies();
   const authToken = cookieStore.get(AUTH_COOKIE_NAME)?.value;
 
-  const shouldShowLogin = params.login === "1" && !isValidAuthToken(authToken);
+  const shouldShowLogin = !isValidAuthToken(authToken);
 
   return (
     <>
       <HomeEntrance />
-      {shouldShowLogin ? <LoginForm nextPath={getSafeNextPath(params.next)} /> : null}
+      {shouldShowLogin ? (
+        <LoginForm nextPath={getSafeNextPath(params.next)} />
+      ) : null}
     </>
   );
 }

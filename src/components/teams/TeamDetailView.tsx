@@ -9,6 +9,7 @@ import type { Team } from "@/types";
 
 interface TeamDetailViewProps {
   budget: number;
+  canManage: boolean;
   players: TeamPlayerRow[];
   team: Team;
   teamSlug: string;
@@ -34,6 +35,7 @@ function formatPrice(value: number) {
 
 export default function TeamDetailView({
   budget,
+  canManage,
   players,
   team,
   teamSlug,
@@ -221,7 +223,7 @@ export default function TeamDetailView({
               )}
             </div>
           </div>
-          {isEditingBudget && (
+          {canManage && isEditingBudget && (
             <button
               className="team-budget-button team-budget-button-confirm"
               disabled={isSavingBudget}
@@ -235,6 +237,7 @@ export default function TeamDetailView({
         </div>
       </div>
 
+      {canManage ? (
       <div className="team-budget-card">
         <div className="team-budget-actions">
           <button
@@ -269,16 +272,23 @@ export default function TeamDetailView({
           </div>
         )}
       </div>
+      ) : null}
 
-      <TeamPlayersTable players={players} teamSlug={teamSlug} />
+      <TeamPlayersTable
+        canManage={canManage}
+        players={players}
+        teamSlug={teamSlug}
+      />
     </div>
   );
 }
 
 function TeamPlayersTable({
+  canManage,
   players,
   teamSlug,
 }: {
+  canManage: boolean;
   players: TeamPlayerRow[];
   teamSlug: string;
 }) {
@@ -322,7 +332,7 @@ function TeamPlayersTable({
 
   return (
     <div className="team-roster-table">
-      <div className="team-roster-head">
+      <div className={`team-roster-head${canManage ? "" : " is-readonly"}`}>
         <span>No</span>
         <span>Player</span>
         <span>OVR</span>
@@ -334,10 +344,13 @@ function TeamPlayersTable({
         <span>DEF</span>
         <span>PHY</span>
         <span>Price</span>
-        <span>Action</span>
+        {canManage ? <span>Action</span> : null}
       </div>
       {players.map((player, index) => (
-        <div className="team-roster-row" key={player.player_key}>
+        <div
+          className={`team-roster-row${canManage ? "" : " is-readonly"}`}
+          key={player.player_key}
+        >
           <span className="team-roster-no">{index + 1}</span>
           <div className="team-roster-player">
             {player.avatar_url && (
@@ -354,6 +367,7 @@ function TeamPlayersTable({
           <span>{player.def}</span>
           <span>{player.phy}</span>
           <span>{formatPrice(player.transaction_price)}</span>
+          {canManage ? (
           <button
             className="team-roster-removeButton"
             disabled={Boolean(pendingPlayerKey)}
@@ -363,6 +377,7 @@ function TeamPlayersTable({
             <span>移除球员</span>
             <span>Remove Player</span>
           </button>
+          ) : null}
         </div>
       ))}
       {errorMessage && <div className="team-roster-error">{errorMessage}</div>}

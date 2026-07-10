@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import TeamDetailView from "@/components/teams/TeamDetailView";
 import { TEAMS2 } from "@/data/teams2";
+import { isAdminSite } from "@/lib/siteAuth";
 import { readTeamBudget, readTeamPlayers } from "@/lib/supabaseRest";
 
 interface TeamPageProps {
@@ -13,6 +15,8 @@ export function generateStaticParams() {
 
 export default async function TeamPage({ params }: TeamPageProps) {
   const { id } = await params;
+  const headerStore = await headers();
+  const canManage = isAdminSite(headerStore.get("host"));
   const teamEntry = Object.entries(TEAMS2).find(
     ([, team]) => team.sname === decodeURIComponent(id),
   );
@@ -37,6 +41,7 @@ export default async function TeamPage({ params }: TeamPageProps) {
       </h2>
       <TeamDetailView
         budget={budget}
+        canManage={canManage}
         players={players}
         team={team}
         teamSlug={teamSname}

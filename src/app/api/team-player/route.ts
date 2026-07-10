@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { TEAMS2 } from "@/data/teams2";
+import { AUTH_COOKIE_NAME, isAuthorizedSiteAdmin } from "@/lib/siteAuth";
 import {
   addPlayerToTeam,
   removeAllPlayersFromTeam,
@@ -17,7 +18,23 @@ const validTeamSnames = new Set(
   Object.values(TEAMS2).map((team) => team.sname).filter(Boolean),
 );
 
-export async function POST(request: Request) {
+function ensureAdminRequest(request: NextRequest) {
+  if (
+    !isAuthorizedSiteAdmin(
+      request.headers.get("host"),
+      request.cookies.get(AUTH_COOKIE_NAME)?.value,
+    )
+  ) {
+    return NextResponse.json({ error: "Admin only." }, { status: 403 });
+  }
+
+  return null;
+}
+
+export async function POST(request: NextRequest) {
+  const authError = ensureAdminRequest(request);
+  if (authError) return authError;
+
   try {
     const payload = (await request.json()) as AddTeamPlayerPayload;
     const teamSname = payload.teamSname ?? "";
@@ -55,7 +72,10 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
+  const authError = ensureAdminRequest(request);
+  if (authError) return authError;
+
   try {
     const payload = (await request.json()) as {
       teamSname?: string;

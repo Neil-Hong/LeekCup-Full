@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
@@ -23,6 +23,30 @@ const TEAMS_IN_DRAW = Object.entries(TEAMS2).map(([id, team]) => ({
   id: Number(id),
 }));
 
+function canManageFromBrowser() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const hostname = window.location.hostname.toLowerCase();
+
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "admin.leekcup.com" ||
+    hostname.startsWith("admin.") ||
+    process.env.NEXT_PUBLIC_SITE_MODE === "admin"
+  );
+}
+
+function subscribeToSiteMode() {
+  return () => {};
+}
+
+function getServerCanManageSnapshot() {
+  return false;
+}
+
 function shuffleTeams(teams: TeamEntry[]) {
   const shuffled = [...teams];
 
@@ -41,6 +65,11 @@ export default function DrawPage() {
   const [revealGroups, setRevealGroups] = useState(false);
   const [isConfirmingGroups, setIsConfirmingGroups] = useState(false);
   const [hasConfirmedGroups, setHasConfirmedGroups] = useState(false);
+  const canManage = useSyncExternalStore(
+    subscribeToSiteMode,
+    canManageFromBrowser,
+    getServerCanManageSnapshot,
+  );
   const videoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -174,6 +203,7 @@ export default function DrawPage() {
           <br />
           Redraw
         </button> */}
+        {canManage ? (
         <button
           className="drawButton"
           disabled={
@@ -185,6 +215,7 @@ export default function DrawPage() {
           <br />
           Confirm Group
         </button>
+        ) : null}
       </div>
 
       {showVideo && <DrawVideoOverlay onEnded={finishVideo} />}

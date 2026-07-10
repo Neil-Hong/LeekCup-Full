@@ -18,6 +18,30 @@ export function isProdSite() {
   return getSiteEnv() === "PROD";
 }
 
+export function isAdminSiteHost(host?: string | null) {
+  const hostname = (host ?? "").split(":")[0]?.toLowerCase();
+
+  return hostname === "admin.leekcup.com" || hostname.startsWith("admin.");
+}
+
+export function isAdminDeployment() {
+  const siteMode =
+    process.env.SITE_MODE ?? process.env.NEXT_PUBLIC_SITE_MODE ?? "";
+
+  return (
+    siteMode.trim().toLowerCase() === "admin" ||
+    process.env.VERCEL_GIT_COMMIT_REF === "adminpage"
+  );
+}
+
+export function isAdminSite(host?: string | null) {
+  if (!isProdSite()) {
+    return true;
+  }
+
+  return isAdminDeployment() || isAdminSiteHost(host);
+}
+
 export function getSiteUsername() {
   return process.env.SITE_USERNAME ?? process.env.SITE_USER ?? "";
 }
@@ -38,4 +62,15 @@ export function isValidAuthToken(token?: string | null) {
   const authSecret = getAuthSecret();
 
   return Boolean(authSecret && token && token === authSecret);
+}
+
+export function isAuthorizedSiteAdmin(
+  host?: string | null,
+  token?: string | null,
+) {
+  if (!isProdSite()) {
+    return true;
+  }
+
+  return isAdminSite(host) && isValidAuthToken(token);
 }

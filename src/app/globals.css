@@ -3025,6 +3025,13 @@ form.site-auth-panel > * {
   padding: 10px 14px;
 }
 
+.team-roster-head.is-readonly,
+.team-roster-row.is-readonly {
+  grid-template-columns:
+    minmax(42px, 0.24fr) minmax(180px, 1.7fr) repeat(8, minmax(48px, 0.42fr))
+    minmax(72px, 0.58fr);
+}
+
 .team-roster-head {
   color: #0ebeff;
   background: rgba(14, 190, 255, 0.12);

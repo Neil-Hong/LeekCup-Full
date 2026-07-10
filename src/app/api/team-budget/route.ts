@@ -1,5 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { TEAMS2 } from "@/data/teams2";
+import { AUTH_COOKIE_NAME, isAuthorizedSiteAdmin } from "@/lib/siteAuth";
 import { updateTeamBudget } from "@/lib/supabaseRest";
 
 interface TeamBudgetPayload {
@@ -11,7 +12,16 @@ const validTeamSnames = new Set(
   Object.values(TEAMS2).map((team) => team.sname).filter(Boolean),
 );
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
+  if (
+    !isAuthorizedSiteAdmin(
+      request.headers.get("host"),
+      request.cookies.get(AUTH_COOKIE_NAME)?.value,
+    )
+  ) {
+    return NextResponse.json({ error: "Admin only." }, { status: 403 });
+  }
+
   try {
     const payload = (await request.json()) as TeamBudgetPayload;
     const teamSname = payload.teamSname ?? "";

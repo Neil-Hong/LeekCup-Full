@@ -624,12 +624,12 @@ export default function AuctionClient() {
               onClick={submitBid}
               type="button"
             >
-              <span>鍑轰环</span>
+              <span>出价</span>
               <span>Bid</span>
             </button>
             {state.ownBid && (
               <span className="auction-ownBid">
-                <strong>鎴戠殑鍑轰环 {formatMoney(state.ownBid.amount)}</strong>
+                <strong>我的出价 {formatMoney(state.ownBid.amount)}</strong>
                 <span>My bid</span>
               </span>
             )}
