@@ -6,7 +6,6 @@ import {
   getSiteUsername,
   hasAuthConfig,
   isAdminSite,
-  isProdSite,
 } from "@/lib/siteAuth";
 
 export async function POST(request: NextRequest) {
@@ -15,7 +14,7 @@ export async function POST(request: NextRequest) {
     password?: string;
   } | null;
 
-  if (!isProdSite() && !isAdminSite(request.headers.get("host"))) {
+  if (!isAdminSite(request.headers.get("host"))) {
     return NextResponse.json({ ok: true });
   }
 
