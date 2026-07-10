@@ -3,6 +3,7 @@ import { AUTH_COOKIE_NAME, isProdSite, isValidAuthToken } from "@/lib/siteAuth";
 
 const PUBLIC_PATH_PREFIXES = [
   "/_next",
+  "/api/auction",
   "/api/auth/login",
   "/api/auth/logout",
   "/audio",
@@ -11,7 +12,7 @@ const PUBLIC_PATH_PREFIXES = [
   "/video",
 ];
 
-const PUBLIC_PATHS = new Set(["/", "/favicon.ico"]);
+const PUBLIC_PATHS = new Set(["/", "/auction", "/favicon.ico"]);
 const PUBLIC_ASSET_PATTERN =
   /\.(?:bin|gif|glb|gltf|ico|jpeg|jpg|json|mp3|mp4|ogg|otf|png|svg|ttf|webm|webp|woff|woff2)$/i;
 

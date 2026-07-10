@@ -36,6 +36,11 @@ export default function EntrancePage() {
       </div>
 
       <div className="statics-container mt-6">
+        <Link href="/auction" className="btn">
+          竞拍
+          <br />
+          Auction
+        </Link>
         <Link href="/teams" className="btn">
           阵容
           <br />

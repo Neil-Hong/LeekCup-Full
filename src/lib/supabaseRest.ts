@@ -107,6 +107,7 @@ export interface StatsSummary {
 const supabaseUrl =
   process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const PLAYER_SOURCE_TABLE = "test_player";
 
 export function hasSupabaseServerConfig() {
   return Boolean(supabaseUrl && serviceRoleKey);
@@ -210,7 +211,7 @@ export async function searchFc26Players(query: string) {
   ].join(",");
   const filter = `(name.ilike.*${wildcardQuery}*,canonical_name.ilike.*${wildcardQuery}*)`;
   const response = await fetch(
-    `${restUrl}/fc26_players?select=${select}&or=${encodeURIComponent(filter)}&order=overall_rating.desc.nullslast&limit=8`,
+    `${restUrl}/${PLAYER_SOURCE_TABLE}?select=${select}&or=${encodeURIComponent(filter)}&order=overall_rating.desc.nullslast&limit=8`,
     {
       headers: {
         apikey: serviceRoleKey,
@@ -795,7 +796,7 @@ export async function addPlayerToTeam({
   const { restUrl } = getSupabaseServerConfig();
   const headers = apiHeaders();
   const playerResponse = await fetch(
-    `${restUrl}/fc26_players?select=isSelected&player_key=eq.${encodeURIComponent(player.player_key)}&limit=1`,
+    `${restUrl}/${PLAYER_SOURCE_TABLE}?select=isSelected&player_key=eq.${encodeURIComponent(player.player_key)}&limit=1`,
     {
       headers,
       cache: "no-store",
@@ -871,7 +872,7 @@ export async function addPlayerToTeam({
   }
 
   const selectedResponse = await fetch(
-    `${restUrl}/fc26_players?player_key=eq.${encodeURIComponent(player.player_key)}`,
+    `${restUrl}/${PLAYER_SOURCE_TABLE}?player_key=eq.${encodeURIComponent(player.player_key)}`,
     {
       method: "PATCH",
       headers: {
@@ -913,6 +914,83 @@ export async function addPlayerToTeam({
   return nextBudget;
 }
 
+async function clearAuctionSaleForRemovedPlayer({
+  playerKey,
+  teamSname,
+}: {
+  playerKey: string;
+  teamSname: string;
+}) {
+  const { restUrl } = getSupabaseServerConfig();
+  const headers = apiHeaders();
+  const auctionResultResponse = await fetch(
+    `${restUrl}/auction_results?select=player_key&player_key=eq.${encodeURIComponent(playerKey)}&winner_team_sname=eq.${encodeURIComponent(teamSname)}&limit=1`,
+    {
+      headers,
+      cache: "no-store",
+    },
+  );
+
+  if (!auctionResultResponse.ok) {
+    const message = await auctionResultResponse.text();
+
+    if (message.includes("Could not find the table")) return;
+
+    throw new Error(`Failed to read auction result: ${message}`);
+  }
+
+  const auctionRows = (await auctionResultResponse.json()) as Array<{
+    player_key: string;
+  }>;
+
+  if (auctionRows.length === 0) return;
+
+  const nowIso = new Date().toISOString();
+
+  const [deleteResultResponse, updatePlayerResponse] = await Promise.all([
+    fetch(
+      `${restUrl}/auction_results?player_key=eq.${encodeURIComponent(playerKey)}&winner_team_sname=eq.${encodeURIComponent(teamSname)}`,
+      {
+        method: "DELETE",
+        headers: {
+          ...headers,
+          Prefer: "return=minimal",
+        },
+      },
+    ),
+    fetch(
+      `${restUrl}/auction_players?player_key=eq.${encodeURIComponent(playerKey)}`,
+      {
+        method: "PATCH",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({
+          status: "unsold",
+          sold_to_user_id: null,
+          sold_to_team_sname: null,
+          sold_price: null,
+          updated_at: nowIso,
+        }),
+      },
+    ),
+  ]);
+
+  if (!deleteResultResponse.ok) {
+    throw new Error(
+      `Failed to clear auction result: ${await deleteResultResponse.text()}`,
+    );
+  }
+
+  if (!updatePlayerResponse.ok) {
+    throw new Error(
+      `Failed to clear auction player status: ${await updatePlayerResponse.text()}`,
+    );
+  }
+}
+
 export async function removePlayerFromTeam({
   teamSname,
   playerKey,
@@ -938,7 +1016,7 @@ export async function removePlayerFromTeam({
   }
 
   const selectedResponse = await fetch(
-    `${restUrl}/fc26_players?player_key=eq.${encodeURIComponent(playerKey)}`,
+    `${restUrl}/${PLAYER_SOURCE_TABLE}?player_key=eq.${encodeURIComponent(playerKey)}`,
     {
       method: "PATCH",
       headers: {
@@ -970,6 +1048,8 @@ export async function removePlayerFromTeam({
       `Failed to remove selected player: ${await selectedPlayerResponse.text()}`,
     );
   }
+
+  await clearAuctionSaleForRemovedPlayer({ teamSname, playerKey });
 }
 
 export async function removeAllPlayersFromTeam(teamSname: string) {
@@ -1018,7 +1098,7 @@ export async function removeAllPlayersFromTeam(teamSname: string) {
       }
 
       const sourceResponse = await fetch(
-        `${restUrl}/fc26_players?player_key=eq.${encodeURIComponent(player.player_key)}`,
+        `${restUrl}/${PLAYER_SOURCE_TABLE}?player_key=eq.${encodeURIComponent(player.player_key)}`,
         {
           method: "PATCH",
           headers: {
@@ -1035,6 +1115,11 @@ export async function removeAllPlayersFromTeam(teamSname: string) {
           `Failed to reset player status: ${await sourceResponse.text()}`,
         );
       }
+
+      await clearAuctionSaleForRemovedPlayer({
+        teamSname,
+        playerKey: player.player_key,
+      });
     }),
   );
 }
@@ -1116,7 +1201,7 @@ export async function resetAllTournamentData() {
     }),
     patchRows({
       body: { isSelected: false },
-      tableName: "fc26_players",
+      tableName: PLAYER_SOURCE_TABLE,
       where: "player_key=not.is.null",
     }),
   ]);
