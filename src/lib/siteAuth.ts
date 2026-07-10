@@ -24,6 +24,12 @@ export function isAdminSiteHost(host?: string | null) {
   return hostname === "admin.leekcup.com" || hostname.startsWith("admin.");
 }
 
+export function isPublicSiteHost(host?: string | null) {
+  const hostname = (host ?? "").split(":")[0]?.toLowerCase();
+
+  return hostname === "leekcup.com" || hostname === "www.leekcup.com";
+}
+
 export function isAdminDeployment() {
   const siteMode =
     process.env.SITE_MODE ?? process.env.NEXT_PUBLIC_SITE_MODE ?? "";
@@ -35,11 +41,15 @@ export function isAdminDeployment() {
 }
 
 export function isAdminSite(host?: string | null) {
-  if (!isProdSite()) {
-    return true;
+  if (isPublicSiteHost(host)) {
+    return false;
   }
 
   return isAdminDeployment() || isAdminSiteHost(host);
+}
+
+export function canUseAdminFeatures(host?: string | null) {
+  return !isProdSite() || isAdminSite(host);
 }
 
 export function getSiteUsername() {

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import AddPlayerSearch from "@/components/teams/AddPlayerSearch";
 import { TEAMS2 } from "@/data/teams2";
-import { isAdminSite } from "@/lib/siteAuth";
+import { canUseAdminFeatures } from "@/lib/siteAuth";
 
 interface AddPlayerPageProps {
   params: Promise<{ id: string }>;
@@ -16,7 +16,7 @@ export default async function AddPlayerPage({ params }: AddPlayerPageProps) {
   const { id } = await params;
   const headerStore = await headers();
 
-  if (!isAdminSite(headerStore.get("host"))) {
+  if (!canUseAdminFeatures(headerStore.get("host"))) {
     notFound();
   }
 

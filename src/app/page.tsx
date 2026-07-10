@@ -4,7 +4,6 @@ import HomeEntrance from "@/components/entrance/HomeEntrance";
 import {
   AUTH_COOKIE_NAME,
   isAdminSite,
-  isProdSite,
   isValidAuthToken,
 } from "@/lib/siteAuth";
 
@@ -24,10 +23,6 @@ function getSafeNextPath(nextPath?: string) {
 }
 
 export default async function Home({ searchParams }: HomeProps) {
-  if (!isProdSite()) {
-    return <HomeEntrance />;
-  }
-
   const params = await searchParams;
   const headerStore = await headers();
 

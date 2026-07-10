@@ -2,11 +2,11 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import ResetAllButton from "@/components/groupstage/ResetAllButton";
 import VideoPlayer from "@/components/review/VideoPlayer";
-import { isAdminSite } from "@/lib/siteAuth";
+import { canUseAdminFeatures } from "@/lib/siteAuth";
 
 export default async function EntrancePage() {
   const headerStore = await headers();
-  const canManage = isAdminSite(headerStore.get("host"));
+  const canManage = canUseAdminFeatures(headerStore.get("host"));
 
   return (
     <div className="flex flex-col w-full text-center">

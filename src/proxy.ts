@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   AUTH_COOKIE_NAME,
   isAdminSite,
-  isProdSite,
   isValidAuthToken,
 } from "@/lib/siteAuth";
 
@@ -30,10 +29,6 @@ function isPublicPath(pathname: string) {
 }
 
 export function proxy(request: NextRequest) {
-  if (!isProdSite()) {
-    return NextResponse.next();
-  }
-
   if (!isAdminSite(request.headers.get("host"))) {
     return NextResponse.next();
   }

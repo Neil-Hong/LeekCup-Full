@@ -5,14 +5,14 @@ import {
   buildGroupStandings,
   type GroupStandingRow,
 } from "@/lib/groupStage";
-import { isAdminSite } from "@/lib/siteAuth";
+import { canUseAdminFeatures } from "@/lib/siteAuth";
 import { readGroupMatchResults, readGroupTable } from "@/lib/supabaseRest";
 
 export const dynamic = "force-dynamic";
 
 export default async function GroupStandingsPage() {
   const headerStore = await headers();
-  const canManage = isAdminSite(headerStore.get("host"));
+  const canManage = canUseAdminFeatures(headerStore.get("host"));
   const [groupA, groupB, results] = await Promise.all([
     readGroupTable("GroupA"),
     readGroupTable("GroupB"),
