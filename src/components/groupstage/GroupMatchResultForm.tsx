@@ -1,14 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import type { FormEvent } from "react";
-import { useState } from "react";
 import type { GroupMatch } from "@/lib/groupStage";
 import type {
   GroupMatchPlayerStatRow,
   GroupMatchResultRow,
   MatchPlayerRow,
-  PlayerMatchStatInput,
 } from "@/lib/supabaseRest";
 
 interface GroupMatchResultFormProps {
@@ -26,65 +22,12 @@ export default function GroupMatchResultForm({
   matchPlayerStats,
   result,
 }: GroupMatchResultFormProps) {
-  const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
   const matchStatsByPlayerKey = new Map(
     matchPlayerStats.map((stat) => [stat.player_key, stat]),
   );
 
-  const submitResult = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (isSaving) return;
-
-    const formData = new FormData(event.currentTarget);
-    const readNumber = (name: string) => Number(formData.get(name) ?? 0);
-    const playerStats: PlayerMatchStatInput[] = [...homePlayers, ...awayPlayers].map(
-      (player) => ({
-        player_key: player.player_key,
-        team_sname: player.team_sname,
-        yellow_card: readNumber(`${player.player_key}:yellow_card`),
-        red_card: readNumber(`${player.player_key}:red_card`),
-        goals: readNumber(`${player.player_key}:goals`),
-        assists: readNumber(`${player.player_key}:assists`),
-      }),
-    );
-
-    setIsSaving(true);
-    setErrorMessage("");
-
-    const response = await fetch("/api/groupstage-result", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        awayScore: readNumber("awayScore"),
-        awaySname: match.away.sname,
-        groupName: match.group,
-        homeScore: readNumber("homeScore"),
-        homeSname: match.home.sname,
-        matchSlug: match.slug,
-        playerStats,
-        round: match.round,
-      }),
-    });
-
-    if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as {
-        error?: string;
-      } | null;
-      setErrorMessage(data?.error ?? "Failed to confirm result.");
-      setIsSaving(false);
-      return;
-    }
-
-    router.refresh();
-    setIsSaving(false);
-  };
-
   return (
-    <form className="groupmatch-form" onSubmit={submitResult}>
+    <div className="groupmatch-form">
       <div className="groupmatch-scoreline">
         <MatchTeamHeader img={match.home.img} name={match.home.name} />
         <div className="groupmatch-scoreInput" aria-label="Match score">
@@ -93,6 +36,7 @@ export default function GroupMatchResultForm({
             defaultValue={result?.home_score ?? 0}
             min={0}
             name="homeScore"
+            readOnly
             type="number"
           />
           <span>:</span>
@@ -101,18 +45,12 @@ export default function GroupMatchResultForm({
             defaultValue={result?.away_score ?? 0}
             min={0}
             name="awayScore"
+            readOnly
             type="number"
           />
         </div>
         <MatchTeamHeader img={match.away.img} name={match.away.name} />
       </div>
-
-      <button className="groupmatch-confirmButton" disabled={isSaving} type="submit">
-        <span>确认结果</span>
-        <span>{isSaving ? "Saving..." : "Confirm Result"}</span>
-      </button>
-
-      {errorMessage && <div className="groupmatch-error">{errorMessage}</div>}
 
       <div className="groupmatch-rosters">
         <MatchRosterTable
@@ -128,7 +66,7 @@ export default function GroupMatchResultForm({
           title={match.away.name}
         />
       </div>
-    </form>
+    </div>
   );
 }
 
@@ -226,6 +164,7 @@ function StatInput({
       defaultValue={value}
       min={0}
       name={name}
+      readOnly
       type="number"
     />
   );

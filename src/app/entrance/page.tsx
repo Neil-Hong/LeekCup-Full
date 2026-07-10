@@ -1,13 +1,7 @@
 import Link from "next/link";
-import { headers } from "next/headers";
-import ResetAllButton from "@/components/groupstage/ResetAllButton";
 import VideoPlayer from "@/components/review/VideoPlayer";
-import { canUseAdminFeatures } from "@/lib/siteAuth";
 
-export default async function EntrancePage() {
-  const headerStore = await headers();
-  const canManage = canUseAdminFeatures(headerStore.get("host"));
-
+export default function EntrancePage() {
   return (
     <div className="flex flex-col w-full text-center">
       <h1 className="text-2xl sm:text-3xl text-white font-bold mt-4">
@@ -86,7 +80,6 @@ export default async function EntrancePage() {
           <br />
           Knockout Stage
         </Link>
-        {canManage ? <ResetAllButton className="btn" /> : null}
       </div>
 
       <div className="h-[150px]" />
