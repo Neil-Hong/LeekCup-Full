@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import ReactAudioPlayer from "react-audio-player";
 import { STAGE_1, STAGE_2 } from "@/data/teams";
@@ -23,30 +22,6 @@ const TEAMS_IN_DRAW = Object.entries(TEAMS2).map(([id, team]) => ({
   id: Number(id),
 }));
 
-function canManageFromBrowser() {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  const hostname = window.location.hostname.toLowerCase();
-
-  return (
-    hostname === "localhost" ||
-    hostname === "127.0.0.1" ||
-    hostname === "admin.leekcup.com" ||
-    hostname.startsWith("admin.") ||
-    process.env.NEXT_PUBLIC_SITE_MODE === "admin"
-  );
-}
-
-function subscribeToSiteMode() {
-  return () => {};
-}
-
-function getServerCanManageSnapshot() {
-  return false;
-}
-
 function shuffleTeams(teams: TeamEntry[]) {
   const shuffled = [...teams];
 
@@ -59,43 +34,10 @@ function shuffleTeams(teams: TeamEntry[]) {
 }
 
 export default function DrawPage() {
-  const router = useRouter();
   const [groups, setGroups] = useState<DrawGroups | null>(null);
   const [showVideo, setShowVideo] = useState(false);
   const [revealGroups, setRevealGroups] = useState(false);
-  const [isConfirmingGroups, setIsConfirmingGroups] = useState(false);
-  const [hasConfirmedGroups, setHasConfirmedGroups] = useState(false);
-  const canManage = useSyncExternalStore(
-    subscribeToSiteMode,
-    canManageFromBrowser,
-    getServerCanManageSnapshot,
-  );
   const videoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const checkConfirmedGroups = async () => {
-      const response = await fetch("/api/confirm-groups", {
-        cache: "no-store",
-      });
-
-      if (!response.ok || !isMounted) {
-        return;
-      }
-
-      const data = (await response.json()) as {
-        hasConfirmedGroups?: boolean;
-      };
-      setHasConfirmedGroups(Boolean(data.hasConfirmedGroups));
-    };
-
-    void checkConfirmedGroups();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     return () => {
@@ -127,47 +69,7 @@ export default function DrawPage() {
     });
     setRevealGroups(false);
     setShowVideo(true);
-    setIsConfirmingGroups(false);
     videoTimerRef.current = setTimeout(finishVideo, 6000);
-  };
-
-  const confirmGroups = async () => {
-    if (!groups || !revealGroups || isConfirmingGroups || hasConfirmedGroups) {
-      return;
-    }
-
-    setIsConfirmingGroups(true);
-
-    const response = await fetch("/api/confirm-groups", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        groupA: groups.groupA.map((team, index) => ({
-          position_order: index + 1,
-          team_id: team.id,
-          name: team.name,
-          sname: team.sname ?? "",
-          img: team.img,
-        })),
-        groupB: groups.groupB.map((team, index) => ({
-          position_order: index + 1,
-          team_id: team.id,
-          name: team.name,
-          sname: team.sname ?? "",
-          img: team.img,
-        })),
-      }),
-    });
-
-    if (!response.ok) {
-      setIsConfirmingGroups(false);
-      return;
-    }
-
-    setHasConfirmedGroups(true);
-    router.push("/groupstage");
   };
 
   return (
@@ -203,19 +105,6 @@ export default function DrawPage() {
           <br />
           Redraw
         </button> */}
-        {canManage ? (
-        <button
-          className="drawButton"
-          disabled={
-            !groups || !revealGroups || isConfirmingGroups || hasConfirmedGroups
-          }
-          onClick={confirmGroups}
-        >
-          确认分组
-          <br />
-          Confirm Group
-        </button>
-        ) : null}
       </div>
 
       {showVideo && <DrawVideoOverlay onEnded={finishVideo} />}
