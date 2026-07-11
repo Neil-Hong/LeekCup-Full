@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import GroupMatchResultForm from "@/components/groupstage/GroupMatchResultForm";
 import { buildGroupPlayoffMatches, buildGroupStandings } from "@/lib/groupStage";
+import { canUseAdminFeatures } from "@/lib/siteAuth";
 import {
   readGroupMatchPlayerStats,
   readGroupMatchResult,
@@ -20,6 +22,8 @@ export default async function GroupPlayoffMatchPage({
   params,
 }: GroupPlayoffMatchPageProps) {
   const { match } = await params;
+  const headerStore = await headers();
+  const canEdit = canUseAdminFeatures(headerStore.get("host"));
   const decodedMatch = decodeURIComponent(match);
   const [groupA, groupB, results] = await Promise.all([
     readGroupTable("GroupA"),
@@ -61,6 +65,7 @@ export default async function GroupPlayoffMatchPage({
 
       <GroupMatchResultForm
         awayPlayers={awayPlayers}
+        canEdit={canEdit}
         homePlayers={homePlayers}
         match={currentMatch}
         matchPlayerStats={matchPlayerStats}

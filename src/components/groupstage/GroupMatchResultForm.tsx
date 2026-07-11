@@ -1,18 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { FormEvent } from "react";
 import { useState } from "react";
 import type { GroupMatch } from "@/lib/groupStage";
 import type {
   GroupMatchPlayerStatRow,
   GroupMatchResultRow,
   MatchPlayerRow,
-  PlayerMatchStatInput,
 } from "@/lib/supabaseRest";
 
 interface GroupMatchResultFormProps {
   awayPlayers: MatchPlayerRow[];
+  canEdit?: boolean;
   homePlayers: MatchPlayerRow[];
   match: GroupMatch;
   matchPlayerStats: GroupMatchPlayerStatRow[];
@@ -21,37 +20,40 @@ interface GroupMatchResultFormProps {
 
 export default function GroupMatchResultForm({
   awayPlayers,
+  canEdit = false,
   homePlayers,
   match,
   matchPlayerStats,
   result,
 }: GroupMatchResultFormProps) {
   const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState("");
+  const [error, setError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const matchStatsByPlayerKey = new Map(
     matchPlayerStats.map((stat) => [stat.player_key, stat]),
   );
+  const allPlayers = [...homePlayers, ...awayPlayers];
 
-  const submitResult = async (event: FormEvent<HTMLFormElement>) => {
+  const submitResult = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isSaving) return;
+
+    if (!canEdit || isSaving) {
+      return;
+    }
+
+    setError("");
+    setIsSaving(true);
 
     const formData = new FormData(event.currentTarget);
-    const readNumber = (name: string) => Number(formData.get(name) ?? 0);
-    const playerStats: PlayerMatchStatInput[] = [...homePlayers, ...awayPlayers].map(
-      (player) => ({
-        player_key: player.player_key,
-        team_sname: player.team_sname,
-        yellow_card: readNumber(`${player.player_key}:yellow_card`),
-        red_card: readNumber(`${player.player_key}:red_card`),
-        goals: readNumber(`${player.player_key}:goals`),
-        assists: readNumber(`${player.player_key}:assists`),
-      }),
-    );
-
-    setIsSaving(true);
-    setErrorMessage("");
+    const numberValue = (name: string) => Number(formData.get(name) ?? 0);
+    const playerStats = allPlayers.map((player) => ({
+      player_key: player.player_key,
+      team_sname: player.team_sname,
+      yellow_card: numberValue(`${player.player_key}:yellow_card`),
+      red_card: numberValue(`${player.player_key}:red_card`),
+      goals: numberValue(`${player.player_key}:goals`),
+      assists: numberValue(`${player.player_key}:assists`),
+    }));
 
     const response = await fetch("/api/groupstage-result", {
       method: "POST",
@@ -59,10 +61,10 @@ export default function GroupMatchResultForm({
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        awayScore: readNumber("awayScore"),
+        awayScore: numberValue("awayScore"),
         awaySname: match.away.sname,
         groupName: match.group,
-        homeScore: readNumber("homeScore"),
+        homeScore: numberValue("homeScore"),
         homeSname: match.home.sname,
         matchSlug: match.slug,
         playerStats,
@@ -74,7 +76,7 @@ export default function GroupMatchResultForm({
       const data = (await response.json().catch(() => null)) as {
         error?: string;
       } | null;
-      setErrorMessage(data?.error ?? "Failed to confirm result.");
+      setError(data?.error ?? "Failed to confirm result.");
       setIsSaving(false);
       return;
     }
@@ -93,6 +95,7 @@ export default function GroupMatchResultForm({
             defaultValue={result?.home_score ?? 0}
             min={0}
             name="homeScore"
+            readOnly={!canEdit}
             type="number"
           />
           <span>:</span>
@@ -101,27 +104,32 @@ export default function GroupMatchResultForm({
             defaultValue={result?.away_score ?? 0}
             min={0}
             name="awayScore"
+            readOnly={!canEdit}
             type="number"
           />
         </div>
         <MatchTeamHeader img={match.away.img} name={match.away.name} />
       </div>
 
-      <button className="groupmatch-confirmButton" disabled={isSaving} type="submit">
-        <span>确认结果</span>
-        <span>{isSaving ? "Saving..." : "Confirm Result"}</span>
-      </button>
+      {canEdit ? (
+        <button className="groupmatch-confirmButton" disabled={isSaving} type="submit">
+          <span>确认结果</span>
+          <span>{isSaving ? "Saving..." : "Confirm Result"}</span>
+        </button>
+      ) : null}
 
-      {errorMessage && <div className="groupmatch-error">{errorMessage}</div>}
+      {error ? <div className="groupmatch-error">{error}</div> : null}
 
       <div className="groupmatch-rosters">
         <MatchRosterTable
+          canEdit={canEdit}
           matchStatsByPlayerKey={matchStatsByPlayerKey}
           players={homePlayers}
           startIndex={0}
           title={match.home.name}
         />
         <MatchRosterTable
+          canEdit={canEdit}
           matchStatsByPlayerKey={matchStatsByPlayerKey}
           players={awayPlayers}
           startIndex={homePlayers.length}
@@ -142,11 +150,13 @@ function MatchTeamHeader({ img, name }: { img: string; name: string }) {
 }
 
 function MatchRosterTable({
+  canEdit,
   matchStatsByPlayerKey,
   players,
   startIndex,
   title,
 }: {
+  canEdit: boolean;
   matchStatsByPlayerKey: Map<string, GroupMatchPlayerStatRow>;
   players: MatchPlayerRow[];
   startIndex: number;
@@ -182,21 +192,25 @@ function MatchRosterTable({
                 <StatInput
                   label={`${player.name} yellow card`}
                   name={`${player.player_key}:yellow_card`}
+                  readOnly={!canEdit}
                   value={matchStat?.yellow_card ?? 0}
                 />
                 <StatInput
                   label={`${player.name} red card`}
                   name={`${player.player_key}:red_card`}
+                  readOnly={!canEdit}
                   value={matchStat?.red_card ?? 0}
                 />
                 <StatInput
                   label={`${player.name} goal`}
                   name={`${player.player_key}:goals`}
+                  readOnly={!canEdit}
                   value={matchStat?.goals ?? 0}
                 />
                 <StatInput
                   label={`${player.name} assist`}
                   name={`${player.player_key}:assists`}
+                  readOnly={!canEdit}
                   value={matchStat?.assists ?? 0}
                 />
               </div>
@@ -213,10 +227,12 @@ function MatchRosterTable({
 function StatInput({
   label,
   name,
+  readOnly,
   value,
 }: {
   label: string;
   name: string;
+  readOnly: boolean;
   value: number;
 }) {
   return (
@@ -226,6 +242,7 @@ function StatInput({
       defaultValue={value}
       min={0}
       name={name}
+      readOnly={readOnly}
       type="number"
     />
   );

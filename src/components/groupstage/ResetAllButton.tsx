@@ -15,7 +15,7 @@ export default function ResetAllButton({
     if (isResetting) return;
 
     const confirmed = window.confirm(
-      "此操作会重置分组，清空球队球员数据，确认重置？",
+      "此操作会重置分组，清空球队球员数据，并重置竞拍状态和过程，确认重置？",
     );
 
     if (!confirmed) {
@@ -24,12 +24,18 @@ export default function ResetAllButton({
 
     setIsResetting(true);
 
-    const response = await fetch("/api/reset-all", {
-      method: "POST",
-    });
+    const responses = await Promise.all([
+      fetch("/api/reset-all", {
+        method: "POST",
+      }),
+      fetch("/api/auction/reset", {
+        method: "POST",
+      }),
+    ]);
+    const failedResponse = responses.find((response) => !response.ok);
 
-    if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as {
+    if (failedResponse) {
+      const data = (await failedResponse.json().catch(() => null)) as {
         error?: string;
       } | null;
       window.alert(data?.error ?? "Failed to reset all data.");

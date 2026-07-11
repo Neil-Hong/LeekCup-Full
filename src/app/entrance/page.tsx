@@ -6,7 +6,7 @@ import { canUseAdminFeatures } from "@/lib/siteAuth";
 
 export default async function EntrancePage() {
   const headerStore = await headers();
-  const canManage = canUseAdminFeatures(headerStore.get("host"));
+  const canUseAdminActions = canUseAdminFeatures(headerStore.get("host"));
 
   return (
     <div className="flex flex-col w-full text-center">
@@ -86,7 +86,7 @@ export default async function EntrancePage() {
           <br />
           Knockout Stage
         </Link>
-        {canManage ? <ResetAllButton className="btn" /> : null}
+        {canUseAdminActions ? <ResetAllButton className="btn" /> : null}
       </div>
 
       <div className="h-[150px]" />

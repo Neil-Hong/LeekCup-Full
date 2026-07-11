@@ -3,10 +3,24 @@ import {
   readActiveAuctionUserFromRequest,
   resetAuctionData,
 } from "@/lib/auctionRest";
+import { AUTH_COOKIE_NAME, isAuthorizedSiteAdmin } from "@/lib/siteAuth";
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await readActiveAuctionUserFromRequest(request);
+    const auctionUser = await readActiveAuctionUserFromRequest(request);
+    const siteAdminUser = isAuthorizedSiteAdmin(
+      request.headers.get("host"),
+      request.cookies.get(AUTH_COOKIE_NAME)?.value,
+    )
+      ? {
+          id: "site-admin",
+          username: "site-admin",
+          displayName: "Site Admin",
+          teamSname: null,
+          role: "admin" as const,
+        }
+      : null;
+    const user = auctionUser ?? siteAdminUser;
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });

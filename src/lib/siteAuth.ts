@@ -6,29 +6,33 @@ export function isAdminSiteHost(host?: string | null) {
   return hostname === "admin.leekcup.com" || hostname.startsWith("admin.");
 }
 
-function isVercelRuntime() {
-  return Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
-}
-
-function getLocalSiteMode() {
-  const siteMode =
-    process.env.SITE_MODE ?? process.env.NEXT_PUBLIC_SITE_MODE ?? "";
-
-  return siteMode.trim().toLowerCase();
-}
-
 export function isPublicSiteHost(host?: string | null) {
   const hostname = (host ?? "").split(":")[0]?.toLowerCase();
 
   return hostname === "leekcup.com" || hostname === "www.leekcup.com";
 }
 
+function getConfiguredSiteMode() {
+  const siteMode =
+    process.env.SITE_MODE ??
+    process.env.NEXT_PUBLIC_SITE_MODE ??
+    process.env.ENV ??
+    process.env.SITE_ENV ??
+    "";
+
+  return siteMode.trim().toLowerCase();
+}
+
+function isAdminModeFromEnv() {
+  return getConfiguredSiteMode() === "admin";
+}
+
 export function isAdminSite(host?: string | null) {
-  if (isVercelRuntime()) {
-    return isAdminSiteHost(host);
+  if (isPublicSiteHost(host)) {
+    return false;
   }
 
-  return getLocalSiteMode() === "admin";
+  return isAdminSiteHost(host) || isAdminModeFromEnv();
 }
 
 export function canUseAdminFeatures(host?: string | null) {
