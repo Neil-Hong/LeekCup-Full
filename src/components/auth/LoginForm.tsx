@@ -6,7 +6,7 @@ type LoginFormProps = {
   nextPath?: string;
 };
 
-export default function LoginForm({ nextPath = "/entrance" }: LoginFormProps) {
+export default function LoginForm({ nextPath = "/" }: LoginFormProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

@@ -16,7 +16,7 @@ type HomeProps = {
 
 function getSafeNextPath(nextPath?: string) {
   if (!nextPath || !nextPath.startsWith("/") || nextPath.startsWith("//")) {
-    return "/entrance";
+    return "/";
   }
 
   return nextPath;

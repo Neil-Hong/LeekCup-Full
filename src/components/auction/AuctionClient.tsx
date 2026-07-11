@@ -381,13 +381,13 @@ export default function AuctionClient() {
     setIsBusy(false);
 
     if (!response.ok) {
-      setMessage(data?.error ?? "鍑轰环澶辫触 Bid failed.");
+      setMessage(data?.error ?? "出价失败 Bid failed.");
       return;
     }
 
     triggerActionFlash({
       kind: "message",
-      zh: "鍑轰环鎴愬姛",
+      zh: "出价成功",
       en: "Bid Placed",
     });
     setBidAmount("");

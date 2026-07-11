@@ -1289,7 +1289,7 @@ form.site-auth-panel > * {
   min-height: 100vh;
   padding: 28px 24px 120px;
   color: white;
-  background: url(/images/drawbackground.jpg) center/cover fixed;
+  background: transparent;
   font-family: var(--font-title);
 }
 
@@ -1901,7 +1901,11 @@ form.site-auth-panel > * {
   border: 1px solid rgba(14, 190, 255, 0.95);
   border-radius: 8px;
   background:
-    radial-gradient(circle at center, rgba(14, 190, 255, 0.34), transparent 70%),
+    radial-gradient(
+      circle at center,
+      rgba(14, 190, 255, 0.34),
+      transparent 70%
+    ),
     rgba(0, 0, 0, 0.86);
   color: white;
   font-size: 30px;
