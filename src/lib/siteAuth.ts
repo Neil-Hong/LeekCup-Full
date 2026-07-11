@@ -1,55 +1,32 @@
 export const AUTH_COOKIE_NAME = "leekcup_auth";
 
-export function getSiteEnv() {
-  const explicitEnv = process.env.ENV ?? process.env.SITE_ENV;
-
-  if (explicitEnv) {
-    return explicitEnv.trim().toUpperCase();
-  }
-
-  if (process.env.VERCEL_ENV === "production") {
-    return "PROD";
-  }
-
-  return "DEV";
-}
-
-export function isProdSite() {
-  return getSiteEnv() === "PROD";
-}
-
 export function isAdminSiteHost(host?: string | null) {
   const hostname = (host ?? "").split(":")[0]?.toLowerCase();
 
   return hostname === "admin.leekcup.com" || hostname.startsWith("admin.");
 }
 
-export function isPublicSiteHost(host?: string | null) {
-  const hostname = (host ?? "").split(":")[0]?.toLowerCase();
-
-  return hostname === "leekcup.com" || hostname === "www.leekcup.com";
+function isVercelRuntime() {
+  return Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
 }
 
-export function isAdminDeployment() {
+function getLocalSiteMode() {
   const siteMode =
     process.env.SITE_MODE ?? process.env.NEXT_PUBLIC_SITE_MODE ?? "";
 
-  return (
-    siteMode.trim().toLowerCase() === "admin" ||
-    process.env.VERCEL_GIT_COMMIT_REF === "adminpage"
-  );
+  return siteMode.trim().toLowerCase();
 }
 
 export function isAdminSite(host?: string | null) {
-  if (isPublicSiteHost(host)) {
-    return false;
+  if (isVercelRuntime()) {
+    return isAdminSiteHost(host);
   }
 
-  return isAdminDeployment() || isAdminSiteHost(host);
+  return getLocalSiteMode() === "admin";
 }
 
 export function canUseAdminFeatures(host?: string | null) {
-  return !isProdSite() || isAdminSite(host);
+  return isAdminSite(host);
 }
 
 export function getSiteUsername() {
@@ -78,9 +55,5 @@ export function isAuthorizedSiteAdmin(
   host?: string | null,
   token?: string | null,
 ) {
-  if (!isProdSite()) {
-    return true;
-  }
-
   return isAdminSite(host) && isValidAuthToken(token);
 }

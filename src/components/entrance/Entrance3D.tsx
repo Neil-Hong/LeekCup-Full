@@ -42,7 +42,7 @@ export default function EntranceScene() {
               position={[0.3, 0.7, -1]}
               scale={0.1}
             >
-              {'一年一度的韭菜盛宴,除了"纯粹"还是"纯粹"'}
+              {'韭菜杯重燃战火, 除了"纯粹"还是"纯粹", 我回来了！'}
             </T3D>
             <T3D
               maxWidth={1}
@@ -50,7 +50,7 @@ export default function EntranceScene() {
               position={[0.3, 0.5, -1]}
               scale={0.08}
             >
-              Annually Leek Cup, it was pure, all about money
+              Leekcup once again — It was pure, all about money. I'm back!
             </T3D>
             <T3D
               maxWidth={1}
@@ -58,7 +58,7 @@ export default function EntranceScene() {
               position={[0.3, 0.3, -1]}
               scale={0.1}
             >
-              {'"世界杯？狗都不看,"纯粹"的足球盛宴还得是韭菜杯"'}
+              {'"纯粹"的足球盛宴还得是韭菜杯，拿下！'}
             </T3D>
             <T3D
               maxWidth={1}
@@ -66,7 +66,8 @@ export default function EntranceScene() {
               position={[0.3, 0.1, -1]}
               scale={0.08}
             >
-              Bullshit World Cup, top soccer events only in the Leek Cup
+              The only truly "pure" football spectacle is the Leek Cup. Got the
+              win!
             </T3D>
             {/* <T3D maxWidth={1} font="/fonts/FZYaoTi_Regular.json" position={[1.4, 0.05, 3]} scale={0.05}>
               感谢雪儿后援会自立三群鼎力支持
