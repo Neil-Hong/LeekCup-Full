@@ -59,9 +59,6 @@ interface AuctionSessionRow {
   status: AuctionStatus;
   started_at: string | null;
   ends_at: string | null;
-  tie_round: number | null;
-  tie_team_snames: string[] | null;
-  updated_at: string | null;
 }
 
 interface AuctionPlayerRow {
@@ -382,39 +379,6 @@ async function readBids(playerKey: string) {
   );
 }
 
-function latestBidsByTeam(bids: AuctionBidRow[]) {
-  const latest = new Map<string, AuctionBidRow>();
-
-  for (const bid of [...bids].sort(
-    (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at),
-  )) {
-    if (!latest.has(bid.team_sname)) {
-      latest.set(bid.team_sname, bid);
-    }
-  }
-
-  return [...latest.values()].sort(
-    (a, b) =>
-      b.amount - a.amount ||
-      Date.parse(a.created_at) - Date.parse(b.created_at),
-  );
-}
-
-function effectiveBidsForSession(session: AuctionSessionRow | null, bids: AuctionBidRow[]) {
-  return session?.mode === "sealed" ? latestBidsByTeam(bids) : bids;
-}
-
-function currentTieTeams(session: AuctionSessionRow | null) {
-  return session?.tie_team_snames ?? [];
-}
-
-function resetTieState() {
-  return {
-    tie_round: 0,
-    tie_team_snames: [],
-  };
-}
-
 async function readTeamBudgetMap() {
   const teams = await restFetch<TeamBudgetRow[]>("/teams?select=sname,budget");
 
@@ -441,17 +405,7 @@ export async function readAuctionState(currentUser: AuctionSessionUser | null) {
   const isAdmin = currentUser?.role === "admin";
   const canRevealSealed =
     isAdmin || session?.status === "revealing" || auctionPlayer?.status === "sold";
-  const effectiveBids = effectiveBidsForSession(session, bids);
-  const ownBid =
-    bids
-      .filter((bid) => bid.user_id === currentUser?.id)
-      .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))[0] ??
-    null;
-  const displayBids =
-    session?.mode === "sealed"
-      ? [...bids].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
-      : bids;
-  const visibleBids = displayBids.map((bid) => ({
+  const visibleBids = bids.map((bid) => ({
     id: bid.id,
     user_id: bid.user_id,
     team_sname: bid.team_sname,
@@ -469,8 +423,8 @@ export async function readAuctionState(currentUser: AuctionSessionUser | null) {
     auctionPlayer,
     player,
     bids: visibleBids,
-    ownBid,
-    highestBid: effectiveBids[0] ?? null,
+    ownBid: bids.find((bid) => bid.user_id === currentUser?.id) ?? null,
+    highestBid: bids[0] ?? null,
     submittedBidCount: bids.length,
     totalPlayers: playerCountRows.length,
   } satisfies AuctionState;
@@ -529,22 +483,6 @@ export async function placeAuctionBid({
     return;
   }
 
-  const tieTeams = currentTieTeams(session);
-
-  if (tieTeams.length > 1 && !tieTeams.includes(user.teamSname)) {
-    throw new Error("Only tied bidders can bid in extra sealed round.");
-  }
-
-  const previousBid =
-    bids
-      .filter((bid) => bid.team_sname === user.teamSname)
-      .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))[0] ??
-    null;
-
-  if (previousBid && amount <= previousBid.amount) {
-    throw new Error("Bid must be higher than your previous bid.");
-  }
-
   await restFetch<null>("/auction_bids", {
     method: "POST",
     headers: {
@@ -582,10 +520,6 @@ export async function runAuctionAdminAction({
   }
 
   if (action === "start") {
-    if (session.status !== "idle") {
-      throw new Error("Current auction already started.");
-    }
-
     const nextMode = mode ?? session.mode;
 
     await Promise.all([
@@ -601,7 +535,6 @@ export async function runAuctionAdminAction({
             mode: nextMode,
             status: "running",
             started_at: new Date().toISOString(),
-            ...resetTieState(),
             updated_at: new Date().toISOString(),
           }),
         },
@@ -627,52 +560,6 @@ export async function runAuctionAdminAction({
   }
 
   if (action === "reveal") {
-    if (session.status !== "running") {
-      throw new Error("Auction is not running.");
-    }
-
-    if (session.mode === "public") {
-      throw new Error("Reveal is only available for sealed auctions.");
-    }
-
-    const bids = await readBids(session.current_player_key);
-    const effectiveBids = effectiveBidsForSession(session, bids);
-
-    if (effectiveBids.length === 0) {
-      throw new Error("No bids to reveal.");
-    }
-
-    const tieTeams = currentTieTeams(session);
-    const contenders =
-      tieTeams.length > 1
-        ? effectiveBids.filter((bid) => tieTeams.includes(bid.team_sname))
-        : effectiveBids;
-    const highestAmount = contenders[0]?.amount ?? null;
-    const highestTeams =
-      highestAmount == null
-        ? []
-        : contenders
-            .filter((bid) => bid.amount === highestAmount)
-            .map((bid) => bid.team_sname);
-
-    if (highestTeams.length > 1) {
-      await restFetch<null>(`/auction_sessions?id=eq.${encodeURIComponent(session.id)}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Prefer: "return=minimal",
-        },
-        body: JSON.stringify({
-          status: "running",
-          tie_round: (session.tie_round ?? 0) + 1,
-          tie_team_snames: highestTeams,
-          updated_at: new Date().toISOString(),
-        }),
-      });
-
-      return;
-    }
-
     await restFetch<null>(`/auction_sessions?id=eq.${encodeURIComponent(session.id)}`, {
       method: "PATCH",
       headers: {
@@ -681,7 +568,6 @@ export async function runAuctionAdminAction({
       },
       body: JSON.stringify({
         status: "revealing",
-        ...resetTieState(),
         updated_at: new Date().toISOString(),
       }),
     });
@@ -690,36 +576,8 @@ export async function runAuctionAdminAction({
   }
 
   if (action === "finish") {
-    if (session.status !== "running" && session.status !== "revealing") {
-      throw new Error("Auction is not running.");
-    }
-
-    if (session.mode === "sealed" && session.status !== "revealing") {
-      throw new Error("Please reveal sealed bids first.");
-    }
-
-    const bids = effectiveBidsForSession(
-      session,
-      await readBids(session.current_player_key),
-    );
-
-    if (bids.length === 0) {
-      throw new Error("No bids to finish.");
-    }
-
     await finishCurrentAuction(session);
     return;
-  }
-
-  if (session.status !== "finished") {
-    const bids = await readBids(session.current_player_key);
-
-    if (bids.length === 0) {
-      await finishCurrentAuction(session);
-      return;
-    }
-
-    throw new Error("Please finish current auction first.");
   }
 
   await moveToNextAuctionPlayer(session);
@@ -731,9 +589,7 @@ async function finishCurrentAuction(session: AuctionSessionRow) {
   }
 
   const [highestBid, player] = await Promise.all([
-    readBids(session.current_player_key).then(
-      (bids) => effectiveBidsForSession(session, bids)[0] ?? null,
-    ),
+    readBids(session.current_player_key).then((bids) => bids[0] ?? null),
     readPlayer(session.current_player_key),
   ]);
 
@@ -749,10 +605,7 @@ async function finishCurrentAuction(session: AuctionSessionRow) {
             "Content-Type": "application/json",
             Prefer: "return=minimal",
           },
-          body: JSON.stringify({
-            status: "unsold",
-            updated_at: updatedAt,
-          }),
+          body: JSON.stringify({ status: "unsold", updated_at: updatedAt }),
         },
       ),
       restFetch<null>(`/auction_sessions?id=eq.${encodeURIComponent(session.id)}`, {
@@ -763,7 +616,6 @@ async function finishCurrentAuction(session: AuctionSessionRow) {
         },
         body: JSON.stringify({
           status: "finished",
-          ...resetTieState(),
           updated_at: updatedAt,
         }),
       }),
@@ -819,7 +671,6 @@ async function finishCurrentAuction(session: AuctionSessionRow) {
       },
       body: JSON.stringify({
         status: "finished",
-        ...resetTieState(),
         updated_at: updatedAt,
       }),
     }),
@@ -860,7 +711,6 @@ async function moveToNextAuctionPlayer(session: AuctionSessionRow) {
       status: "idle",
       started_at: null,
       ends_at: null,
-      ...resetTieState(),
       updated_at: new Date().toISOString(),
     }),
   });
@@ -981,7 +831,6 @@ export async function resetAuctionData(user: AuctionSessionUser) {
     status: "idle",
     started_at: null,
     ends_at: null,
-    ...resetTieState(),
     updated_at: updatedAt,
   };
 
