@@ -36,6 +36,8 @@ interface AuctionState {
     current_player_key: string | null;
     mode: "public" | "sealed";
     status: "idle" | "running" | "revealing" | "finished";
+    tie_round: number | null;
+    tie_team_snames: string[] | null;
   } | null;
   auctionPlayer: {
     auction_order: number;
@@ -69,7 +71,13 @@ interface AuctionState {
 
 type Flash =
   | { kind: "start"; zh: string; en: string }
-  | { kind: "deal"; zh: string; en: string }
+  | {
+      kind: "deal";
+      zh: string;
+      en: string;
+      amount?: number | null;
+      teamSname?: string | null;
+    }
   | { kind: "message"; zh: string; en: string };
 
 const emptyState: AuctionState = {
@@ -107,6 +115,10 @@ function formatMoney(value: number | null | undefined) {
 }
 
 function translateAuctionMessage(message: string) {
+  if (message.includes("previous bid")) {
+    return "\u51fa\u4ef7\u4e0d\u5f97\u4f4e\u4e8e\u6216\u7b49\u4e8e\u5148\u524d\u51fa\u4ef7";
+  }
+
   if (message.includes("Bid must be higher")) {
     return "\u51fa\u4ef7\u5fc5\u987b\u9ad8\u4e8e\u5f53\u524d\u6700\u9ad8\u4ef7";
   }
@@ -119,8 +131,32 @@ function translateAuctionMessage(message: string) {
     return "\u7ade\u62cd\u5c1a\u672a\u5f00\u59cb";
   }
 
+  if (message.includes("Reveal is only available")) {
+    return "\u53ea\u6709\u6697\u62cd\u53ef\u4ee5\u63ed\u793a";
+  }
+
+  if (message.includes("No bids to reveal")) {
+    return "\u6682\u65e0\u51fa\u4ef7\uff0c\u4e0d\u80fd\u63ed\u793a";
+  }
+
+  if (message.includes("No bids to finish")) {
+    return "\u6682\u65e0\u51fa\u4ef7\uff0c\u4e0d\u80fd\u6210\u4ea4";
+  }
+
+  if (message.includes("Please finish current auction first")) {
+    return "\u8bf7\u5148\u5b8c\u6210\u5f53\u524d\u7ade\u62cd";
+  }
+
+  if (message.includes("Please reveal sealed bids first")) {
+    return "\u8bf7\u5148\u63ed\u793a\u6697\u62cd\u51fa\u4ef7";
+  }
+
   if (message.includes("Only bidders")) {
     return "\u53ea\u6709\u7ade\u62cd\u8005\u53ef\u4ee5\u51fa\u4ef7";
+  }
+
+  if (message.includes("Only tied bidders")) {
+    return "\u989d\u5916\u8f6e\u6b21\u4ec5\u9650\u5e76\u5217\u7403\u961f\u51fa\u4ef7";
   }
 
   if (message.includes("Invalid bid amount")) {
@@ -231,7 +267,9 @@ export default function AuctionClient() {
     }
 
     const playerStatus = state.auctionPlayer?.status ?? "pending";
-    const signal = `${session.current_player_key}:${session.status}:${playerStatus}`;
+    const tieRound = session.tie_round ?? 0;
+    const tieTeams = session.tie_team_snames ?? [];
+    const signal = `${session.current_player_key}:${session.status}:${playerStatus}:${tieRound}:${tieTeams.join(",")}`;
     const previousSignal = lastAuctionSignalRef.current;
 
     if (!previousSignal) {
@@ -253,6 +291,37 @@ export default function AuctionClient() {
       window.setTimeout(() => triggerActionFlash(flash, duration), 0);
     };
 
+    if (playerStatus === "sold") {
+      queueFlash(
+        {
+          kind: "deal",
+          zh: "\u7ade\u62cd\u6210\u529f",
+          en: "Auction Won",
+          amount: state.auctionPlayer?.sold_price,
+          teamSname: state.auctionPlayer?.sold_to_team_sname,
+        },
+        10000,
+      );
+      return;
+    }
+
+    if (playerStatus === "unsold") {
+      queueFlash({ kind: "message", zh: "\u6d41\u62cd", en: "Unsold" }, 1800);
+      return;
+    }
+
+    if (session.status === "running" && tieRound > 0 && tieTeams.length > 1) {
+      queueFlash(
+        {
+          kind: "message",
+          zh: "\u51fa\u4ef7\u76f8\u540c\uff0c\u8fdb\u5165\u989d\u5916\u8f6e\u6b21\u6697\u62cd",
+          en: "Tie bids, extra sealed round",
+        },
+        10000,
+      );
+      return;
+    }
+
     if (session.status === "running") {
       queueFlash(
         { kind: "start", zh: "\u5f00\u59cb\u7ade\u62cd", en: "Running" },
@@ -262,18 +331,15 @@ export default function AuctionClient() {
     }
 
     if (session.status === "revealing") {
-      queueFlash({ kind: "message", zh: "\u63ed\u793a", en: "Reveal" });
-      return;
+      queueFlash({ kind: "message", zh: "\u63ed\u793a", en: "Reveal" }, 5000);
     }
-
-    if (
-      session.status === "finished" ||
-      playerStatus === "sold" ||
-      playerStatus === "unsold"
-    ) {
-      queueFlash({ kind: "deal", zh: "\u6210\u4ea4", en: "Deal" }, 1600);
-    }
-  }, [state.auctionPlayer?.status, state.session, triggerActionFlash]);
+  }, [
+    state.auctionPlayer?.sold_price,
+    state.auctionPlayer?.sold_to_team_sname,
+    state.auctionPlayer?.status,
+    state.session,
+    triggerActionFlash,
+  ]);
 
   const currentCardImage = useMemo(() => {
     const player = state.player;
@@ -302,6 +368,17 @@ export default function AuctionClient() {
     !isAdmin;
   const mode = state.session?.mode ?? "public";
   const status = state.session?.status ?? "idle";
+  const hasBids = state.submittedBidCount > 0;
+  const tieTeamSnames = state.session?.tie_team_snames ?? [];
+  const isTieRound =
+    mode === "sealed" &&
+    (state.session?.tie_round ?? 0) > 0 &&
+    tieTeamSnames.length > 1;
+  const canBidInTieRound =
+    !isTieRound ||
+    (state.currentUser?.teamSname
+      ? tieTeamSnames.includes(state.currentUser.teamSname)
+      : false);
   const displayStatus =
     state.auctionPlayer?.status === "sold" ||
     state.auctionPlayer?.status === "unsold"
@@ -322,7 +399,7 @@ export default function AuctionClient() {
     setIsBusy(false);
 
     if (!response.ok) {
-      setMessage(data?.error ?? "鐧诲綍澶辫触 Login failed.");
+      setMessage(data?.error ?? "登陆失败 Login failed.");
       return;
     }
 
@@ -415,14 +492,6 @@ export default function AuctionClient() {
           "\u7ba1\u7406\u5458\u64cd\u4f5c\u5931\u8d25 Admin action failed.",
       );
       return;
-    }
-
-    if (action === "next") {
-      triggerActionFlash({
-        kind: "message",
-        zh: "\u4e0b\u4e00\u4f4d",
-        en: "Next Player",
-      });
     }
 
     await loadState();
@@ -620,7 +689,11 @@ export default function AuctionClient() {
               type="number"
             />
             <button
-              disabled={isBusy || state.session?.status !== "running"}
+              disabled={
+                isBusy ||
+                state.session?.status !== "running" ||
+                !canBidInTieRound
+              }
               onClick={submitBid}
               type="button"
             >
@@ -631,6 +704,12 @@ export default function AuctionClient() {
               <span className="auction-ownBid">
                 <strong>我的出价 {formatMoney(state.ownBid.amount)}</strong>
                 <span>My bid</span>
+              </span>
+            )}
+            {isTieRound && !canBidInTieRound && (
+              <span className="auction-ownBid">
+                <strong>仅限并列球队</strong>
+                <span>Tied bidders only</span>
               </span>
             )}
           </div>
@@ -647,19 +726,47 @@ export default function AuctionClient() {
               <option value="public">{"\u660e\u62cd Public"}</option>
               <option value="sealed">{"\u6697\u62cd Sealed"}</option>
             </select>
-            <button onClick={() => adminAction("start")} type="button">
+            <button
+              disabled={isBusy || status !== "idle"}
+              onClick={() => adminAction("start")}
+              type="button"
+            >
               <span>{"\u5f00\u59cb"}</span>
               <span>Start</span>
             </button>
-            <button onClick={() => adminAction("reveal")} type="button">
+            <button
+              disabled={
+                isBusy || status !== "running" || mode === "public" || !hasBids
+              }
+              onClick={() => adminAction("reveal")}
+              type="button"
+            >
               <span>{"\u63ed\u793a"}</span>
               <span>Reveal</span>
             </button>
-            <button onClick={() => adminAction("finish")} type="button">
+            <button
+              disabled={
+                isBusy ||
+                (mode === "sealed"
+                  ? status !== "revealing"
+                  : status !== "running" && status !== "revealing") ||
+                !hasBids
+              }
+              onClick={() => adminAction("finish")}
+              type="button"
+            >
               <span>{"\u6210\u4ea4"}</span>
               <span>Finish</span>
             </button>
-            <button onClick={() => adminAction("next")} type="button">
+            <button
+              disabled={
+                isBusy ||
+                status === "idle" ||
+                (status !== "finished" && hasBids)
+              }
+              onClick={() => adminAction("next")}
+              type="button"
+            >
               <span>{"\u4e0b\u4e00\u4f4d"}</span>
               <span>Next</span>
             </button>
@@ -717,6 +824,22 @@ function AuctionFlash({ flash }: { flash: Flash }) {
         <span>{flash.zh}</span>
         <span>{flash.en}</span>
       </strong>
+      {flash.kind === "deal" && flash.teamSname ? (
+        <span className="auction-flashWinner">
+          {teamBySname[flash.teamSname] ? (
+            <img
+              src={teamBySname[flash.teamSname].img}
+              alt={teamBySname[flash.teamSname].name}
+            />
+          ) : null}
+          <span>
+            <strong>
+              {teamBySname[flash.teamSname]?.name ?? flash.teamSname}
+            </strong>
+            <em>{formatMoney(flash.amount)}</em>
+          </span>
+        </span>
+      ) : null}
     </div>
   );
 }
