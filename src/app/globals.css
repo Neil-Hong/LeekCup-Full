@@ -1861,7 +1861,8 @@ form.site-auth-panel > * {
 
 .auction-smallButton:disabled,
 .auction-bidForm button:disabled,
-.auction-loginPanel button:disabled {
+.auction-loginPanel button:disabled,
+.auction-adminPanel button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
   transform: none;
@@ -1895,8 +1896,10 @@ form.site-auth-panel > * {
   width: min(480px, 78%);
   min-height: 104px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   padding: 16px 22px;
   border: 1px solid rgba(14, 190, 255, 0.95);
   border-radius: 8px;
@@ -1933,6 +1936,40 @@ form.site-auth-panel > * {
   flex-direction: column;
   gap: 0;
   animation: none;
+}
+
+.auction-flashWinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: white;
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+.auction-flashWinner img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.auction-flashWinner span {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.auction-flashWinner strong {
+  font-size: 16px;
+  color: white;
+}
+
+.auction-flashWinner em {
+  color: #0ebeff;
+  font-size: 14px;
+  font-style: normal;
 }
 
 .auction-actionFlash.is-countdown > span {
@@ -2024,8 +2061,8 @@ form.site-auth-panel > * {
     transform: translate(-50%, -50%) scale(1);
   }
   100% {
-    opacity: 0;
-    transform: translate(-50%, -54%) scale(0.98);
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
