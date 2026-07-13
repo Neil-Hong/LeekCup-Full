@@ -6,20 +6,35 @@ import {
   type GroupStandingRow,
 } from "@/lib/groupStage";
 import { canUseAdminFeatures } from "@/lib/siteAuth";
-import { readGroupMatchResults, readGroupTable } from "@/lib/supabaseRest";
+import {
+  readAllGroupMatchPlayerStats,
+  readGroupMatchResults,
+  readGroupTable,
+} from "@/lib/supabaseRest";
 
 export const dynamic = "force-dynamic";
 
 export default async function GroupStandingsPage() {
   const headerStore = await headers();
   const canManage = canUseAdminFeatures(headerStore.get("host"));
-  const [groupA, groupB, results] = await Promise.all([
+  const [groupA, groupB, results, playerStats] = await Promise.all([
     readGroupTable("GroupA"),
     readGroupTable("GroupB"),
     readGroupMatchResults(),
+    readAllGroupMatchPlayerStats(),
   ]);
-  const groupAStandings = buildGroupStandings("GroupA", groupA, results);
-  const groupBStandings = buildGroupStandings("GroupB", groupB, results);
+  const groupAStandings = buildGroupStandings(
+    "GroupA",
+    groupA,
+    results,
+    playerStats,
+  );
+  const groupBStandings = buildGroupStandings(
+    "GroupB",
+    groupB,
+    results,
+    playerStats,
+  );
   const groupStageResultCount = results.filter(
     (result) => result.group_name === "GroupA" || result.group_name === "GroupB",
   ).length;

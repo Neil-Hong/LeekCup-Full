@@ -5,6 +5,7 @@ import {
   type GroupMatch,
 } from "@/lib/groupStage";
 import {
+  readAllGroupMatchPlayerStats,
   readGroupMatchResults,
   readGroupTable,
   type GroupMatchResultRow,
@@ -19,13 +20,24 @@ const QUESTION_TEAM = {
 };
 
 export default async function GroupPlayoffsPage() {
-  const [groupA, groupB, results] = await Promise.all([
+  const [groupA, groupB, results, playerStats] = await Promise.all([
     readGroupTable("GroupA"),
     readGroupTable("GroupB"),
     readGroupMatchResults(),
+    readAllGroupMatchPlayerStats(),
   ]);
-  const groupAStandings = buildGroupStandings("GroupA", groupA, results);
-  const groupBStandings = buildGroupStandings("GroupB", groupB, results);
+  const groupAStandings = buildGroupStandings(
+    "GroupA",
+    groupA,
+    results,
+    playerStats,
+  );
+  const groupBStandings = buildGroupStandings(
+    "GroupB",
+    groupB,
+    results,
+    playerStats,
+  );
   const groupStageResultCount = results.filter(
     (result) => result.group_name === "GroupA" || result.group_name === "GroupB",
   ).length;

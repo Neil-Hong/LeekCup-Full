@@ -5,6 +5,7 @@ import GroupMatchResultForm from "@/components/groupstage/GroupMatchResultForm";
 import { buildGroupPlayoffMatches, buildGroupStandings } from "@/lib/groupStage";
 import { canUseAdminFeatures } from "@/lib/siteAuth";
 import {
+  readAllGroupMatchPlayerStats,
   readGroupMatchPlayerStats,
   readGroupMatchResult,
   readGroupMatchResults,
@@ -25,13 +26,24 @@ export default async function GroupPlayoffMatchPage({
   const headerStore = await headers();
   const canEdit = canUseAdminFeatures(headerStore.get("host"));
   const decodedMatch = decodeURIComponent(match);
-  const [groupA, groupB, results] = await Promise.all([
+  const [groupA, groupB, results, playerStats] = await Promise.all([
     readGroupTable("GroupA"),
     readGroupTable("GroupB"),
     readGroupMatchResults(),
+    readAllGroupMatchPlayerStats(),
   ]);
-  const groupAStandings = buildGroupStandings("GroupA", groupA, results);
-  const groupBStandings = buildGroupStandings("GroupB", groupB, results);
+  const groupAStandings = buildGroupStandings(
+    "GroupA",
+    groupA,
+    results,
+    playerStats,
+  );
+  const groupBStandings = buildGroupStandings(
+    "GroupB",
+    groupB,
+    results,
+    playerStats,
+  );
   const matches = buildGroupPlayoffMatches(groupAStandings, groupBStandings);
   const currentMatch = matches.find((entry) => entry.slug === decodedMatch);
 

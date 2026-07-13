@@ -413,6 +413,26 @@ export async function readGroupMatchPlayerStats(matchSlug: string) {
   return (await response.json()) as GroupMatchPlayerStatRow[];
 }
 
+export async function readAllGroupMatchPlayerStats() {
+  if (!hasSupabaseServerConfig()) {
+    return [];
+  }
+
+  const { restUrl } = getSupabaseServerConfig();
+  const response = await fetch(`${restUrl}/groupMatchPlayerStats?select=*`, {
+    headers: apiHeaders(),
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to read all group match player stats: ${await response.text()}`,
+    );
+  }
+
+  return (await response.json()) as GroupMatchPlayerStatRow[];
+}
+
 function sortLeaderboardRows<T extends { name: string }>(
   rows: T[],
   metric: keyof T,
