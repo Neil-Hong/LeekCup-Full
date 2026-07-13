@@ -10,6 +10,7 @@ const PUBLIC_PATH_PREFIXES = [
   "/api/auction",
   "/api/auth/login",
   "/api/auth/logout",
+  "/api/player-search",
   "/audio",
   "/fonts",
   "/images",

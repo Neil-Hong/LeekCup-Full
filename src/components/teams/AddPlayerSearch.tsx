@@ -20,6 +20,8 @@ export default function AddPlayerSearch({
   const [transactionPrice, setTransactionPrice] = useState("0");
   const [isConfirming, setIsConfirming] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [searchMessage, setSearchMessage] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     const trimmedQuery = query.trim();
@@ -31,6 +33,8 @@ export default function AddPlayerSearch({
     const controller = new AbortController();
     const timeoutId = window.setTimeout(async () => {
       setIsLoading(true);
+      setSearchMessage("");
+      setHasSearched(false);
 
       try {
         const response = await fetch(
@@ -40,19 +44,26 @@ export default function AddPlayerSearch({
 
         if (!response.ok) {
           setResults([]);
+          setSearchMessage("搜索失败 / Search failed");
           return;
         }
 
         const data = (await response.json()) as {
           players?: Fc26PlayerSearchResult[];
         };
-        setResults(data.players ?? []);
+        const players = data.players ?? [];
+        setResults(players);
+        setSearchMessage(
+          players.length === 0 ? "没有找到球员 / No players found" : "",
+        );
       } catch {
         if (!controller.signal.aborted) {
           setResults([]);
+          setSearchMessage("搜索失败 / Search failed");
         }
       } finally {
         if (!controller.signal.aborted) {
+          setHasSearched(true);
           setIsLoading(false);
         }
       }
@@ -94,6 +105,8 @@ export default function AddPlayerSearch({
     if (value.trim().length < 2) {
       setResults([]);
       setIsLoading(false);
+      setSearchMessage("");
+      setHasSearched(false);
     }
   };
 
@@ -196,10 +209,13 @@ export default function AddPlayerSearch({
           value={query}
         />
 
-        {!selectedPlayer && (results.length > 0 || isLoading) && (
+        {!selectedPlayer &&
+          (results.length > 0 || isLoading || (hasSearched && searchMessage)) && (
           <div className="add-player-results">
             {isLoading ? (
               <div className="add-player-resultStatus">Searching...</div>
+            ) : searchMessage ? (
+              <div className="add-player-resultStatus">{searchMessage}</div>
             ) : (
               results.map((player) => (
                 <button

@@ -107,7 +107,7 @@ export interface StatsSummary {
 const supabaseUrl =
   process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const PLAYER_SOURCE_TABLE = "test_player";
+const PLAYER_SOURCE_TABLE = "fc26_players";
 
 export function hasSupabaseServerConfig() {
   return Boolean(supabaseUrl && serviceRoleKey);
@@ -298,7 +298,9 @@ async function readTeamScoreStats(teamSname: string) {
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to read team score stats: ${await response.text()}`);
+    throw new Error(
+      `Failed to read team score stats: ${await response.text()}`,
+    );
   }
 
   const rows = (await response.json()) as { goals: number; conceded: number }[];
@@ -338,7 +340,9 @@ async function updateTeamScoreStats({
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to update team score stats: ${await response.text()}`);
+    throw new Error(
+      `Failed to update team score stats: ${await response.text()}`,
+    );
   }
 }
 
@@ -354,7 +358,9 @@ export async function readGroupMatchResults() {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to read group match results: ${await response.text()}`);
+    throw new Error(
+      `Failed to read group match results: ${await response.text()}`,
+    );
   }
 
   return (await response.json()) as GroupMatchResultRow[];
@@ -375,7 +381,9 @@ export async function readGroupMatchResult(matchSlug: string) {
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to read group match result: ${await response.text()}`);
+    throw new Error(
+      `Failed to read group match result: ${await response.text()}`,
+    );
   }
 
   const rows = (await response.json()) as GroupMatchResultRow[];
@@ -444,7 +452,9 @@ export async function readPlayerLeaderboard(metric: PlayerLeaderboardMetric) {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to read player leaderboard: ${await response.text()}`);
+    throw new Error(
+      `Failed to read player leaderboard: ${await response.text()}`,
+    );
   }
 
   const rows = (await response.json()) as PlayerLeaderboardRow[];
@@ -466,7 +476,9 @@ export async function readTeamLeaderboard(metric: TeamLeaderboardMetric) {
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to read team leaderboard: ${await response.text()}`);
+    throw new Error(
+      `Failed to read team leaderboard: ${await response.text()}`,
+    );
   }
 
   const rows = (await response.json()) as TeamLeaderboardRow[];
@@ -506,7 +518,9 @@ export async function readStatsSummary(): Promise<StatsSummary> {
   }
 
   if (!teamsResponse.ok) {
-    throw new Error(`Failed to read total goals: ${await teamsResponse.text()}`);
+    throw new Error(
+      `Failed to read total goals: ${await teamsResponse.text()}`,
+    );
   }
 
   if (!selectedPlayersResponse.ok) {
@@ -623,7 +637,9 @@ export async function readSelectedPlayersForTeam(teamSname: string) {
   );
 
   if (!response.ok) {
-    throw new Error(`Failed to read selected players: ${await response.text()}`);
+    throw new Error(
+      `Failed to read selected players: ${await response.text()}`,
+    );
   }
 
   return (await response.json()) as MatchPlayerRow[];
@@ -705,7 +721,10 @@ export async function saveGroupStageResult({
               Prefer: "return=minimal",
             },
             body: JSON.stringify({
-              yellow_card: Math.max(0, (total?.yellow_card ?? 0) + deltas.yellow_card),
+              yellow_card: Math.max(
+                0,
+                (total?.yellow_card ?? 0) + deltas.yellow_card,
+              ),
               red_card: Math.max(0, (total?.red_card ?? 0) + deltas.red_card),
               goals: Math.max(0, (total?.goals ?? 0) + deltas.goals),
               assists: Math.max(0, (total?.assists ?? 0) + deltas.assists),
@@ -720,24 +739,27 @@ export async function saveGroupStageResult({
         }
       }
 
-      const matchStatResponse = await fetch(`${restUrl}/groupMatchPlayerStats`, {
-        method: "POST",
-        headers: {
-          ...headers,
-          "Content-Type": "application/json",
-          Prefer: "resolution=merge-duplicates,return=minimal",
+      const matchStatResponse = await fetch(
+        `${restUrl}/groupMatchPlayerStats`,
+        {
+          method: "POST",
+          headers: {
+            ...headers,
+            "Content-Type": "application/json",
+            Prefer: "resolution=merge-duplicates,return=minimal",
+          },
+          body: JSON.stringify({
+            match_slug: matchSlug,
+            player_key: stat.player_key,
+            team_sname: stat.team_sname,
+            yellow_card: stat.yellow_card,
+            red_card: stat.red_card,
+            goals: stat.goals,
+            assists: stat.assists,
+            updated_at: new Date().toISOString(),
+          }),
         },
-        body: JSON.stringify({
-          match_slug: matchSlug,
-          player_key: stat.player_key,
-          team_sname: stat.team_sname,
-          yellow_card: stat.yellow_card,
-          red_card: stat.red_card,
-          goals: stat.goals,
-          assists: stat.assists,
-          updated_at: new Date().toISOString(),
-        }),
-      });
+      );
 
       if (!matchStatResponse.ok) {
         throw new Error(
@@ -767,7 +789,9 @@ export async function saveGroupStageResult({
   });
 
   if (!resultResponse.ok) {
-    throw new Error(`Failed to save group match result: ${await resultResponse.text()}`);
+    throw new Error(
+      `Failed to save group match result: ${await resultResponse.text()}`,
+    );
   }
 
   await Promise.all([
@@ -804,7 +828,9 @@ export async function addPlayerToTeam({
   );
 
   if (!playerResponse.ok) {
-    throw new Error(`Failed to check player status: ${await playerResponse.text()}`);
+    throw new Error(
+      `Failed to check player status: ${await playerResponse.text()}`,
+    );
   }
 
   const playerRows = (await playerResponse.json()) as { isSelected: boolean }[];
@@ -840,15 +866,18 @@ export async function addPlayerToTeam({
     transaction_price: transactionPrice,
   };
 
-  const insertResponse = await fetch(`${restUrl}/${encodeURIComponent(teamSname)}`, {
-    method: "POST",
-    headers: {
-      ...headers,
-      "Content-Type": "application/json",
-      Prefer: "resolution=merge-duplicates,return=minimal",
+  const insertResponse = await fetch(
+    `${restUrl}/${encodeURIComponent(teamSname)}`,
+    {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal",
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
+  );
 
   if (!insertResponse.ok) {
     throw new Error(`Failed to add player: ${await insertResponse.text()}`);
@@ -885,7 +914,9 @@ export async function addPlayerToTeam({
   );
 
   if (!selectedResponse.ok) {
-    throw new Error(`Failed to update player status: ${await selectedResponse.text()}`);
+    throw new Error(
+      `Failed to update player status: ${await selectedResponse.text()}`,
+    );
   }
 
   const selectedPlayerResponse = await fetch(`${restUrl}/selectedPlayer`, {
@@ -1029,7 +1060,9 @@ export async function removePlayerFromTeam({
   );
 
   if (!selectedResponse.ok) {
-    throw new Error(`Failed to reset player status: ${await selectedResponse.text()}`);
+    throw new Error(
+      `Failed to reset player status: ${await selectedResponse.text()}`,
+    );
   }
 
   const selectedPlayerResponse = await fetch(
@@ -1207,7 +1240,10 @@ export async function resetAllTournamentData() {
   ]);
 
   await Promise.all([
-    deleteRows({ tableName: "selectedPlayer", where: "player_key=not.is.null" }),
+    deleteRows({
+      tableName: "selectedPlayer",
+      where: "player_key=not.is.null",
+    }),
     deleteRows({
       tableName: "groupMatchResults",
       where: "match_slug=not.is.null",
