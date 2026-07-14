@@ -12,6 +12,7 @@ import {
   readAuctionToken,
   type AuctionSessionUser,
 } from "@/lib/auctionAuth";
+import { isAuctionBidder, type AuctionUserRole } from "@/lib/auctionRoles";
 
 type AuctionMode = "public" | "sealed";
 type AuctionStatus = "idle" | "running" | "revealing" | "finished";
@@ -24,7 +25,7 @@ interface AuctionUserRow {
   password_hash: string;
   display_name: string;
   team_sname: string | null;
-  role: "admin" | "bidder";
+  role: AuctionUserRole;
   budget: number;
 }
 
@@ -33,7 +34,7 @@ interface PublicAuctionUserRow {
   username: string;
   display_name: string;
   team_sname: string | null;
-  role: "admin" | "bidder";
+  role: AuctionUserRole;
   budget: number;
 }
 
@@ -97,7 +98,7 @@ export interface AuctionSetupUserInput {
   password: string;
   displayName: string;
   teamSname?: string | null;
-  role: "admin" | "bidder";
+  role: AuctionUserRole;
   budget?: number;
 }
 
@@ -483,7 +484,7 @@ export async function placeAuctionBid({
   amount: number;
   user: AuctionSessionUser;
 }) {
-  if (user.role !== "bidder" || !user.teamSname) {
+  if (!isAuctionBidder(user.role) || !user.teamSname) {
     throw new Error("Only bidders can place bids.");
   }
 

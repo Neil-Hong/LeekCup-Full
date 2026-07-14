@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TEAMS2 } from "@/data/teams2";
+import { isAuctionViewer, type AuctionUserRole } from "@/lib/auctionRoles";
 
 interface AuctionUser {
   id: string;
   username: string;
   display_name: string;
   team_sname: string | null;
-  role: "admin" | "bidder";
+  role: AuctionUserRole;
   budget: number;
 }
 
@@ -27,7 +28,7 @@ interface AuctionState {
     username: string;
     displayName: string;
     teamSname: string | null;
-    role: "admin" | "bidder";
+    role: AuctionUserRole;
   } | null;
   users: AuctionUser[];
   session: {
@@ -362,6 +363,9 @@ export default function AuctionClient() {
   );
 
   const isAdmin = state.currentUser?.role === "admin";
+  const isViewer = state.currentUser
+    ? isAuctionViewer(state.currentUser.role)
+    : false;
   const sealedHidden =
     state.session?.mode === "sealed" &&
     state.session.status !== "revealing" &&
@@ -649,7 +653,7 @@ export default function AuctionClient() {
         </div>
       )}
 
-      <section className="auction-bidBoard">
+      <section className={`auction-bidBoard${isViewer ? " is-viewer" : ""}`}>
         <div className="auction-currentPrice">
           <h3>
             <span>{"\u5f53\u524d\u6700\u9ad8\u4ef7"}</span>
@@ -678,7 +682,7 @@ export default function AuctionClient() {
           </span>
         </div>
 
-        {!isAdmin && (
+        {!isAdmin && !isViewer && (
           <div
             className={`auction-bidForm ${actionFlash ? "is-flashing" : ""}`}
           >

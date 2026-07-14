@@ -1,5 +1,6 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import type { AuctionUserRole } from "@/lib/auctionRoles";
 
 export const AUCTION_COOKIE_NAME = "leekcup_auction_auth";
 
@@ -8,7 +9,7 @@ export interface AuctionSessionUser {
   username: string;
   displayName: string;
   teamSname: string | null;
-  role: "admin" | "bidder";
+  role: AuctionUserRole;
 }
 
 export interface AuctionTokenPayload extends AuctionSessionUser {
