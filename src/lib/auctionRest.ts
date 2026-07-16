@@ -253,7 +253,15 @@ export async function createExclusiveAuctionUserSession(userId: string) {
 }
 
 export async function readActiveAuctionUserFromRequest(request: NextRequest) {
-  const token = readAuctionToken(request.cookies.get(AUCTION_COOKIE_NAME)?.value);
+  return readActiveAuctionUserFromCookieValue(
+    request.cookies.get(AUCTION_COOKIE_NAME)?.value,
+  );
+}
+
+export async function readActiveAuctionUserFromCookieValue(
+  cookieValue?: string | null,
+) {
+  const token = readAuctionToken(cookieValue);
 
   if (!token) return null;
 
@@ -474,6 +482,22 @@ export async function readAuctionState(currentUser: AuctionSessionUser | null) {
     highestBid: effectiveBids[0] ?? null,
     submittedBidCount: bids.length,
     totalPlayers: playerCountRows.length,
+  } satisfies AuctionState;
+}
+
+export async function readAuctionDisplayState() {
+  const state = await readAuctionState(null);
+  const isSealedBeforeReveal =
+    state.session?.mode === "sealed" &&
+    state.session.status !== "revealing" &&
+    state.auctionPlayer?.status !== "sold";
+
+  return {
+    ...state,
+    currentUser: null,
+    ownBid: null,
+    highestBid: isSealedBeforeReveal ? null : state.highestBid,
+    bids: isSealedBeforeReveal ? [] : state.bids,
   } satisfies AuctionState;
 }
 

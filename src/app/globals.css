@@ -1542,13 +1542,13 @@ form.site-auth-panel > * {
   font-size: 14px;
 }
 
-.auction-bidBoard.is-viewer {
+.auction-bidBoard.is-display {
   grid-template-columns: minmax(170px, 260px) minmax(220px, 320px);
   justify-content: center;
   min-height: 132px;
 }
 
-.auction-bidBoard.is-viewer .auction-currentPrice {
+.auction-bidBoard.is-display .auction-currentPrice {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: minmax(170px, 260px) minmax(220px, 320px);
@@ -1559,17 +1559,17 @@ form.site-auth-panel > * {
   text-align: center;
 }
 
-.auction-bidBoard.is-viewer .auction-currentPrice h3 {
+.auction-bidBoard.is-display .auction-currentPrice h3 {
   grid-row: 1 / -1;
   align-items: center;
   margin: 0;
 }
 
-.auction-bidBoard.is-viewer .auction-currentPrice strong {
+.auction-bidBoard.is-display .auction-currentPrice strong {
   align-self: end;
 }
 
-.auction-bidBoard.is-viewer .auction-currentPrice .auction-currentBidder {
+.auction-bidBoard.is-display .auction-currentPrice .auction-currentBidder {
   align-self: start;
   align-items: center;
   margin-top: 4px;
@@ -2058,21 +2058,21 @@ form.site-auth-panel > * {
     flex-wrap: wrap;
   }
 
-  .auction-bidBoard.is-viewer,
-  .auction-bidBoard.is-viewer .auction-currentPrice {
+  .auction-bidBoard.is-display,
+  .auction-bidBoard.is-display .auction-currentPrice {
     grid-template-columns: 1fr;
   }
 
-  .auction-bidBoard.is-viewer .auction-currentPrice {
+  .auction-bidBoard.is-display .auction-currentPrice {
     row-gap: 8px;
   }
 
-  .auction-bidBoard.is-viewer .auction-currentPrice h3 {
+  .auction-bidBoard.is-display .auction-currentPrice h3 {
     grid-row: auto;
   }
 
-  .auction-bidBoard.is-viewer .auction-currentPrice strong,
-  .auction-bidBoard.is-viewer .auction-currentPrice .auction-currentBidder {
+  .auction-bidBoard.is-display .auction-currentPrice strong,
+  .auction-bidBoard.is-display .auction-currentPrice .auction-currentBidder {
     align-self: auto;
   }
 
@@ -3366,6 +3366,7 @@ form.site-auth-panel > * {
   border-top: 1px solid rgba(14, 190, 255, 0.18);
   font-size: 13px;
   font-weight: 800;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .groupmatch-player-cell {
@@ -3435,6 +3436,7 @@ form.site-auth-panel > * {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .team-roster-removeButton {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { TEAMS2 } from "@/data/teams2";
-import { isAuctionViewer, type AuctionUserRole } from "@/lib/auctionRoles";
+import { canAccessAuctionDisplay, type AuctionUserRole } from "@/lib/auctionRoles";
 
 interface AuctionUser {
   id: string;
@@ -202,7 +202,11 @@ function BilingualLabel({
   );
 }
 
-export default function AuctionClient() {
+export default function AuctionClient({
+  displayOnly = false,
+}: {
+  displayOnly?: boolean;
+}) {
   const [state, setState] = useState<AuctionState>(emptyState);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -215,10 +219,17 @@ export default function AuctionClient() {
   const lastAuctionSignalRef = useRef<string | null>(null);
 
   const loadState = useCallback(async () => {
-    const response = await fetch("/api/auction/state", { cache: "no-store" });
+    const endpoint = displayOnly
+      ? "/api/auction/display-state"
+      : "/api/auction/state";
+    const response = await fetch(endpoint, { cache: "no-store" });
     const data = (await response.json()) as AuctionState | { error?: string };
 
     if (!response.ok) {
+      if (!displayOnly && response.status === 401) {
+        return;
+      }
+
       setMessage(
         "\u52a0\u8f7d\u7ade\u62cd\u72b6\u6001\u5931\u8d25 Failed to load auction state.",
       );
@@ -226,17 +237,43 @@ export default function AuctionClient() {
     }
 
     setState(data as AuctionState);
-  }, []);
+  }, [displayOnly]);
 
   useEffect(() => {
+    const refreshInterval = displayOnly ? 2000 : 1000;
     const initialTimer = window.setTimeout(loadState, 0);
-    const timer = window.setInterval(loadState, 1000);
+    let timer: number | null = null;
+
+    const refresh = () => {
+      if (displayOnly && document.visibilityState === "hidden") return;
+      void loadState();
+    };
+
+    const startPolling = () => {
+      if (timer !== null) window.clearInterval(timer);
+      timer = window.setInterval(refresh, refreshInterval);
+    };
+
+    const onVisibilityChange = () => {
+      if (displayOnly && document.visibilityState === "hidden") {
+        if (timer !== null) window.clearInterval(timer);
+        timer = null;
+        return;
+      }
+
+      refresh();
+      startPolling();
+    };
+
+    startPolling();
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       window.clearTimeout(initialTimer);
-      window.clearInterval(timer);
+      if (timer !== null) window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
     };
-  }, [loadState]);
+  }, [displayOnly, loadState]);
 
   useEffect(
     () => () => {
@@ -362,10 +399,8 @@ export default function AuctionClient() {
     [state.users],
   );
 
-  const isAdmin = state.currentUser?.role === "admin";
-  const isViewer = state.currentUser
-    ? isAuctionViewer(state.currentUser.role)
-    : false;
+  const isAdmin = !displayOnly && state.currentUser?.role === "admin";
+  const canOpenLivePage = canAccessAuctionDisplay(state.currentUser);
   const sealedHidden =
     state.session?.mode === "sealed" &&
     state.session.status !== "revealing" &&
@@ -501,7 +536,7 @@ export default function AuctionClient() {
     await loadState();
   };
 
-  if (!state.currentUser) {
+  if (!state.currentUser && !displayOnly) {
     return (
       <main className="auction-page groupstage-enterPage">
         <section className="auction-loginPanel">
@@ -539,7 +574,7 @@ export default function AuctionClient() {
           </h1>
           <h2>2026-2027 Season 84452 LEEK CUP AUCTION</h2>
         </div>
-        <div className="auction-titleActions">
+        {!displayOnly && <div className="auction-titleActions">
           {isAdmin && (
             <button
               className="auction-smallButton"
@@ -550,6 +585,16 @@ export default function AuctionClient() {
               <span>{"\u91cd\u7f6e\u7ade\u62cd"}</span>
               <span>Reset Auction</span>
             </button>
+          )}
+          {canOpenLivePage && (
+            <Link
+              className="auction-smallButton"
+              href="/auction/display"
+              target="_blank"
+            >
+              <span>直播页面</span>
+              <span>Live Page</span>
+            </Link>
           )}
           <button
             className="auction-smallButton"
@@ -563,7 +608,7 @@ export default function AuctionClient() {
             <span>返回</span>
             <span>Back</span>
           </Link>
-        </div>
+        </div>}
       </div>
 
       <section className="auction-mainGrid">
@@ -653,7 +698,7 @@ export default function AuctionClient() {
         </div>
       )}
 
-      <section className={`auction-bidBoard${isViewer ? " is-viewer" : ""}`}>
+      <section className={`auction-bidBoard${displayOnly ? " is-display" : ""}`}>
         <div className="auction-currentPrice">
           <h3>
             <span>{"\u5f53\u524d\u6700\u9ad8\u4ef7"}</span>
@@ -682,7 +727,7 @@ export default function AuctionClient() {
           </span>
         </div>
 
-        {!isAdmin && !isViewer && (
+        {!isAdmin && !displayOnly && (
           <div
             className={`auction-bidForm ${actionFlash ? "is-flashing" : ""}`}
           >

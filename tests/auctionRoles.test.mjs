@@ -1,20 +1,29 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  canAccessAuctionDisplay,
   isAuctionAdmin,
   isAuctionBidder,
-  isAuctionViewer,
 } from "../src/lib/auctionRoles.ts";
 
-test("viewer is display-only and cannot bid or administer auctions", () => {
-  assert.equal(isAuctionViewer("viewer"), true);
-  assert.equal(isAuctionBidder("viewer"), false);
-  assert.equal(isAuctionAdmin("viewer"), false);
+test("only afei can access the protected auction display", () => {
+  assert.equal(
+    canAccessAuctionDisplay({ username: "afei", role: "admin" }),
+    true,
+  );
+  assert.equal(
+    canAccessAuctionDisplay({ username: "team1", role: "bidder" }),
+    false,
+  );
+  assert.equal(
+    canAccessAuctionDisplay({ username: "another-admin", role: "admin" }),
+    false,
+  );
+  assert.equal(canAccessAuctionDisplay(null), false);
 });
 
 test("bidder and admin permissions remain distinct", () => {
   assert.equal(isAuctionBidder("bidder"), true);
   assert.equal(isAuctionAdmin("bidder"), false);
   assert.equal(isAuctionAdmin("admin"), true);
-  assert.equal(isAuctionViewer("admin"), false);
 });
