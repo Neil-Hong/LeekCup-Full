@@ -22,6 +22,21 @@ interface DrawClientProps {
   canConfirmGroups: boolean;
 }
 
+interface StoredGroupTeam {
+  team_id: number;
+  name: string;
+  sname: string;
+  img: string;
+}
+
+interface ConfirmedGroupsResponse {
+  groupAHasData?: boolean;
+  groupBHasData?: boolean;
+  hasConfirmedGroups?: boolean;
+  groupA?: StoredGroupTeam[];
+  groupB?: StoredGroupTeam[];
+}
+
 const TEAMS_IN_DRAW = Object.entries(TEAMS2).map(([id, team]) => ({
   ...team,
   id: Number(id),
@@ -38,6 +53,15 @@ function shuffleTeams(teams: TeamEntry[]) {
   return shuffled;
 }
 
+function toTeamEntries(teams: StoredGroupTeam[]) {
+  return teams.map((team) => ({
+    id: team.team_id,
+    name: team.name,
+    sname: team.sname,
+    img: team.img,
+  }));
+}
+
 export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
   const router = useRouter();
   const [groups, setGroups] = useState<DrawGroups | null>(null);
@@ -45,24 +69,50 @@ export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
   const [revealGroups, setRevealGroups] = useState(false);
   const [isConfirmingGroups, setIsConfirmingGroups] = useState(false);
   const [hasConfirmedGroups, setHasConfirmedGroups] = useState(false);
+  const [hasSavedGroupData, setHasSavedGroupData] = useState(false);
+  const [isLoadingSavedGroups, setIsLoadingSavedGroups] = useState(true);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const videoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     const checkConfirmedGroups = async () => {
-      const response = await fetch("/api/confirm-groups", {
-        cache: "no-store",
-      });
+      try {
+        const response = await fetch("/api/confirm-groups", {
+          cache: "no-store",
+        });
 
-      if (!response.ok || !isMounted) {
-        return;
+        if (!response.ok || !isMounted) {
+          if (isMounted) {
+            setIsLoadingSavedGroups(false);
+          }
+          return;
+        }
+
+        const data = (await response.json()) as ConfirmedGroupsResponse;
+
+        const hasSavedGroups = Boolean(
+          data.groupAHasData || data.groupBHasData,
+        );
+
+        setHasConfirmedGroups(Boolean(data.hasConfirmedGroups));
+        setHasSavedGroupData(hasSavedGroups);
+
+        if (hasSavedGroups) {
+          setGroups({
+            groupA: toTeamEntries(data.groupA ?? []),
+            groupB: toTeamEntries(data.groupB ?? []),
+          });
+          setRevealGroups(true);
+        }
+
+        setIsLoadingSavedGroups(false);
+      } catch {
+        if (isMounted) {
+          setIsLoadingSavedGroups(false);
+        }
       }
-
-      const data = (await response.json()) as {
-        hasConfirmedGroups?: boolean;
-      };
-      setHasConfirmedGroups(Boolean(data.hasConfirmedGroups));
     };
 
     void checkConfirmedGroups();
@@ -90,6 +140,10 @@ export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
   };
 
   const handleDraw = () => {
+    if (canConfirmGroups && hasSavedGroupData) {
+      return;
+    }
+
     const shuffledTeams = shuffleTeams(TEAMS_IN_DRAW);
 
     if (videoTimerRef.current) {
@@ -107,11 +161,18 @@ export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
   };
 
   const confirmGroups = async () => {
-    if (!groups || !revealGroups || isConfirmingGroups || hasConfirmedGroups) {
+    if (
+      !groups ||
+      !revealGroups ||
+      isConfirmingGroups ||
+      hasConfirmedGroups ||
+      hasSavedGroupData
+    ) {
       return;
     }
 
     setIsConfirmingGroups(true);
+    setIsConfirmDialogOpen(false);
 
     const response = await fetch("/api/confirm-groups", {
       method: "POST",
@@ -138,11 +199,30 @@ export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
 
     if (!response.ok) {
       setIsConfirmingGroups(false);
+
+      if (response.status === 409) {
+        setHasSavedGroupData(true);
+      }
+
       return;
     }
 
     setHasConfirmedGroups(true);
     router.push("/groupstage");
+  };
+
+  const requestGroupConfirmation = () => {
+    if (
+      !groups ||
+      !revealGroups ||
+      isConfirmingGroups ||
+      hasConfirmedGroups ||
+      hasSavedGroupData
+    ) {
+      return;
+    }
+
+    setIsConfirmDialogOpen(true);
   };
 
   return (
@@ -168,7 +248,11 @@ export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
       <img src="/images/draw.png" className="drawImage" alt="drawScene" />
 
       <div className="flex flex-row flex-wrap justify-center gap-4 my-4">
-        <button className="drawButton" onClick={handleDraw}>
+        <button
+          className="drawButton"
+          disabled={canConfirmGroups && (hasSavedGroupData || isLoadingSavedGroups)}
+          onClick={handleDraw}
+        >
           抽签
           <br />
           Draw
@@ -180,9 +264,10 @@ export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
               !groups ||
               !revealGroups ||
               isConfirmingGroups ||
-              hasConfirmedGroups
+              hasConfirmedGroups ||
+              hasSavedGroupData
             }
-            onClick={confirmGroups}
+            onClick={requestGroupConfirmation}
           >
             确认分组
             <br />
@@ -192,6 +277,13 @@ export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
       </div>
 
       {showVideo && <DrawVideoOverlay onEnded={finishVideo} />}
+      {isConfirmDialogOpen && (
+        <ConfirmGroupsDialog
+          isConfirming={isConfirmingGroups}
+          onCancel={() => setIsConfirmDialogOpen(false)}
+          onConfirm={confirmGroups}
+        />
+      )}
 
       <div className="draw-groups">
         <DrawGroup
@@ -210,6 +302,98 @@ export default function DrawClient({ canConfirmGroups }: DrawClientProps) {
 
       <div className="h-[150px]" />
     </div>
+  );
+}
+
+function ConfirmGroupsDialog({
+  isConfirming,
+  onCancel,
+  onConfirm,
+}: {
+  isConfirming: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const actionButtonStyle = {
+    minWidth: 116,
+    padding: "10px 18px",
+    color: "#ffffff",
+    cursor: isConfirming ? "not-allowed" : "pointer",
+    background: "#02070d",
+    border: "1px solid #0ebeff",
+    borderRadius: 6,
+    font: "inherit",
+    opacity: isConfirming ? 0.58 : 1,
+  } as const;
+
+  return createPortal(
+    <div
+      className="draw-confirm-overlay"
+      role="presentation"
+      style={{
+        position: "fixed",
+        zIndex: 10000,
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxSizing: "border-box",
+        padding: 24,
+        background: "rgba(0, 0, 0, 0.72)",
+        backdropFilter: "blur(6px)",
+      }}
+    >
+      <section
+        aria-labelledby="draw-confirm-title"
+        aria-modal="true"
+        className="draw-confirm-dialog"
+        role="dialog"
+        style={{
+          width: "min(470px, 100%)",
+          boxSizing: "border-box",
+          padding: 32,
+          color: "#ffffff",
+          textAlign: "center",
+          background: "rgba(1, 10, 24, 0.98)",
+          border: "1px solid #0ebeff",
+          borderRadius: 8,
+          boxShadow: "0 0 24px rgba(14, 190, 255, 0.72)",
+        }}
+      >
+        <h3 id="draw-confirm-title">确认分组</h3>
+        <p>确认抽签分组后无法更改，是否确认？</p>
+        <p>Once the draw groups are confirmed, they cannot be changed. Proceed?</p>
+        <div
+          className="draw-confirm-actions"
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 16,
+            marginTop: 26,
+          }}
+        >
+          <button
+            disabled={isConfirming}
+            onClick={onCancel}
+            style={actionButtonStyle}
+            type="button"
+          >
+            <span>否</span>
+            <span>No</span>
+          </button>
+          <button
+            disabled={isConfirming}
+            onClick={onConfirm}
+            style={actionButtonStyle}
+            type="button"
+          >
+            <span>{isConfirming ? "确认中" : "是"}</span>
+            <span>{isConfirming ? "Confirming" : "Yes"}</span>
+          </button>
+        </div>
+      </section>
+    </div>,
+    document.body,
   );
 }
 

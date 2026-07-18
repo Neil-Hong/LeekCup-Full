@@ -39,6 +39,8 @@ export async function GET() {
       groupAHasData: groupA.length > 0,
       groupBHasData: groupB.length > 0,
       hasConfirmedGroups: groupA.length > 0 && groupB.length > 0,
+      groupA,
+      groupB,
     });
   } catch (error) {
     return NextResponse.json(
@@ -65,6 +67,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "GroupA and GroupB must each contain 8 teams." },
         { status: 400 },
+      );
+    }
+
+    const [existingGroupA, existingGroupB] = await Promise.all([
+      readGroupTable("GroupA"),
+      readGroupTable("GroupB"),
+    ]);
+
+    if (existingGroupA.length > 0 || existingGroupB.length > 0) {
+      return NextResponse.json(
+        { error: "Draw groups have already been confirmed." },
+        { status: 409 },
       );
     }
 
