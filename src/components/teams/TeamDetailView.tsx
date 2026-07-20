@@ -186,6 +186,13 @@ export default function TeamDetailView({
         <span>返回阵容</span>
         <span>Back to Teams</span>
       </Link>
+      <Link
+        href={`/teams/${encodeURIComponent(teamSlug)}/settings`}
+        className="team-detail-navButton team-detail-settingsButton"
+      >
+        <span>{"\u7403\u961f\u8bbe\u7f6e"}</span>
+        <span>Team Settings</span>
+      </Link>
 
       <div className="team-detail-summary">
         <div className="team-detail-panel">

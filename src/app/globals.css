@@ -2981,6 +2981,853 @@ form.site-auth-panel > * {
     0 18px 38px rgba(0, 0, 0, 0.55);
 }
 
+.team-detail-settingsButton {
+  top: 68px;
+}
+
+.team-settings-page {
+  min-height: 100vh;
+  padding-bottom: 72px;
+}
+
+.team-settings-pageTitle {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  font-size: 22px;
+  gap: 3px;
+  margin: 16px 0 10px;
+  text-align: center;
+}
+
+.team-settings-pageTitle span {
+  display: block;
+  width: 100%;
+}
+
+.team-settings-pageTitle span:last-child {
+  color: #00c8ff;
+  font-size: 17px;
+}
+.team-settings-shell,
+.team-settings-loginPanel {
+  margin: 18px auto 0;
+  max-width: 1250px;
+  position: relative;
+}
+
+.team-settings-status,
+.team-settings-loginCard,
+.team-settings-roster,
+.team-settings-pitchPanel,
+.team-settings-tactics {
+  background: rgba(0, 10, 21, 0.9);
+  border: 1px solid #00baf0;
+  box-shadow: 0 0 18px rgba(0, 191, 255, 0.27);
+}
+
+.team-settings-status {
+  color: #fff;
+  margin: 80px auto;
+  max-width: 460px;
+  padding: 30px;
+  text-align: center;
+}
+
+.team-settings-topbar {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.team-settings-topbar .team-detail-navButton {
+  position: static;
+}
+
+.team-settings-topActions {
+  align-items: center;
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.team-settings-topActions .team-settings-primaryButton,
+.team-settings-topActions .team-settings-logout {
+  align-items: center;
+  background:
+    radial-gradient(circle at top, rgba(14, 190, 255, 0.2), transparent 42%),
+    rgba(0, 0, 0, 0.78);
+  border-color: rgba(14, 190, 255, 0.72);
+  border-radius: 8px;
+  box-shadow:
+    0 0 12px rgba(14, 190, 255, 0.75),
+    0 0 48px rgba(14, 190, 255, 0.16);
+  display: inline-flex;
+  font-weight: 800;
+  justify-content: center;
+  line-height: 1.1;
+  min-height: 52px;
+  min-width: 128px;
+  padding: 8px 16px;
+}
+
+.team-settings-teamIdentity {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  gap: 12px;
+}
+
+.team-settings-teamIdentity img {
+  height: 48px;
+  object-fit: contain;
+  width: 48px;
+}
+
+.team-settings-teamIdentity div,
+.team-settings-logout,
+.team-settings-primaryButton,
+.team-settings-sectionTitle,
+.team-settings-loginCard h2,
+.team-settings-loginCard p {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-settings-teamIdentity strong {
+  font-size: 20px;
+}
+.team-settings-teamIdentity span,
+.team-settings-sectionTitle span:last-child,
+.team-settings-primaryButton span:last-child,
+.team-settings-logout span:last-child,
+.team-settings-loginCard > p {
+  color: #00c8ff;
+}
+
+.team-settings-logout,
+.team-settings-primaryButton {
+  background: rgba(0, 8, 17, 0.95);
+  border: 1px solid #00baf0;
+  color: #fff;
+  cursor: pointer;
+  min-width: 130px;
+  padding: 10px 18px;
+  text-align: center;
+}
+
+.team-settings-logout:hover,
+.team-settings-primaryButton:hover:not(:disabled),
+.team-settings-player:hover,
+.team-settings-slot:hover {
+  background: rgba(0, 108, 156, 0.4);
+  box-shadow: 0 0 16px rgba(0, 210, 255, 0.5);
+}
+
+.team-settings-primaryButton:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.team-settings-layout {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(210px, 0.8fr) minmax(440px, 1.5fr) minmax(
+      210px,
+      0.8fr
+    );
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.team-settings-roster,
+.team-settings-pitchPanel,
+.team-settings-tactics {
+  min-height: 620px;
+  padding: 18px;
+}
+
+.team-settings-sectionTitle {
+  color: #fff;
+  font-size: 22px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.team-settings-sectionTitle span:last-child {
+  font-size: 16px;
+}
+.team-settings-hint,
+.team-settings-empty {
+  color: #a9eaff;
+  font-size: 13px;
+  text-align: center;
+}
+
+.team-settings-tabs {
+  background: rgba(1, 26, 48, 0.72);
+  border: 1px solid rgba(0, 186, 240, 0.34);
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 16px;
+  padding: 6px;
+}
+
+.team-settings-pitchPanel .team-settings-tabs button {
+  align-items: center;
+  background: rgba(0, 25, 46, 0.9);
+  border: 1px solid rgba(0, 186, 240, 0.66);
+  color: #fff;
+  cursor: pointer;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px;
+  line-height: 1.15;
+  min-height: 58px;
+  justify-content: center;
+  padding: 7px 12px;
+  width: 100%;
+}
+
+.team-settings-tabs button > span,
+.team-settings-tabs button > small {
+  display: block !important;
+  white-space: nowrap;
+}
+
+.team-settings-tabs button > span {
+  color: #d9f6ff;
+  font-size: 17px;
+}
+.team-settings-tabs button > small {
+  color: #67dfff;
+  font-size: 12px !important;
+}
+.team-settings-tabs button:hover,
+.team-settings-tabs button.is-active {
+  background: rgba(0, 83, 137, 0.62);
+  border-color: #00d5ff;
+  box-shadow: 0 0 14px rgba(0, 204, 255, 0.38);
+}
+.team-settings-tabs button.is-active > span {
+  color: #fff;
+}
+.team-settings-tabs button.is-active > small {
+  color: #00e7ff;
+}
+
+.team-settings-roster {
+  min-height: 680px;
+}
+.team-settings-roster .team-settings-playerList {
+  display: grid;
+  gap: 9px;
+  margin-top: 12px;
+  max-height: 590px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.team-settings-player {
+  align-items: center;
+  background: rgba(3, 36, 71, 0.9);
+  border: 1px solid rgba(0, 177, 234, 0.65);
+  color: #fff;
+  cursor: grab;
+  display: flex;
+  gap: 9px;
+  min-height: 58px;
+  padding: 7px;
+  text-align: left;
+}
+
+.team-settings-player.is-assigned {
+  opacity: 0.58;
+}
+.team-settings-player img,
+.team-settings-avatarFallback {
+  border: 1px solid #00c8ff;
+  border-radius: 50%;
+  height: 38px;
+  object-fit: cover;
+  width: 38px;
+}
+.team-settings-avatarFallback {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+.team-settings-player strong,
+.team-settings-player small {
+  display: block;
+}
+.team-settings-player small {
+  color: #00c8ff;
+  margin-top: 2px;
+}
+
+.team-settings-select,
+.team-settings-tactics select,
+.team-settings-loginForm input {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #00baf0;
+  color: #fff;
+  min-height: 42px;
+  padding: 8px 10px;
+  width: 100%;
+}
+
+.team-settings-pitch {
+  background:
+    linear-gradient(180deg, rgba(0, 196, 124, 0.1) 50%, transparent 50%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 100, 56, 0.3),
+      rgba(0, 100, 56, 0.3) 16%,
+      rgba(0, 68, 44, 0.35) 16%,
+      rgba(0, 68, 44, 0.35) 32%
+    );
+  border: 1px solid rgba(232, 255, 250, 0.8);
+  margin-top: 16px;
+  min-height: 540px;
+  overflow: hidden;
+  position: relative;
+}
+
+.team-settings-pitch::before {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  content: "";
+  height: 110px;
+  left: calc(50% - 55px);
+  position: absolute;
+  top: calc(50% - 55px);
+  width: 110px;
+}
+
+.team-settings-pitchCenter {
+  border-top: 1px solid rgba(255, 255, 255, 0.72);
+  left: 0;
+  position: absolute;
+  top: 50%;
+  width: 100%;
+}
+
+.team-settings-slot {
+  align-items: center;
+  background: rgba(0, 5, 14, 0.82);
+  border: 1px solid #00c8ff;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  height: 62px;
+  justify-content: center;
+  padding: 2px;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 62px;
+  z-index: 1;
+}
+
+.team-settings-slot.is-filled {
+  background: rgba(0, 81, 126, 0.96);
+}
+.team-settings-slot.is-filled {
+  height: 74px;
+  width: 74px;
+}
+.team-settings-slot.is-filled img {
+  border-radius: 50%;
+  height: 46px;
+  object-fit: cover;
+  width: 46px;
+}
+
+.team-settings-slot small {
+  font-size: 10px;
+  line-height: 1.1;
+  max-width: 58px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-settings-slot.is-filled small {
+  font-size: 11px;
+  font-weight: 700;
+  max-width: 66px;
+}
+
+.team-settings-tactics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.team-settings-tactics > label {
+  color: #fff;
+  display: grid;
+  gap: 7px;
+  font-size: 14px;
+}
+.team-settings-range span {
+  display: flex;
+  justify-content: space-between;
+}
+.team-settings-range strong {
+  color: #00c8ff;
+}
+.team-settings-range input {
+  accent-color: #00c8ff;
+}
+.team-settings-teamTactics {
+  background: rgba(0, 37, 70, 0.62);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 14px;
+  padding: 13px;
+}
+
+.team-settings-teamTactics .team-settings-sectionTitle {
+  font-size: 16px;
+  margin-bottom: 0;
+}
+
+.team-settings-teamTactics label,
+.team-settings-playerRole label {
+  color: #fff;
+  display: grid;
+  font-size: 14px;
+  gap: 7px;
+  min-width: 0;
+  width: 100%;
+}
+
+.team-settings-teamTactics label > span,
+.team-settings-playerRole label > span {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: flex-start;
+}
+
+.team-settings-teamTactics small,
+.team-settings-playerRole small {
+  color: #00c8ff;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.team-settings-teamTactics select,
+.team-settings-playerRole select,
+.team-settings-lineHeight input {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #00baf0;
+  color: #fff;
+  min-height: 38px;
+  padding: 7px 9px;
+  width: 100%;
+}
+
+.team-settings-teamTactics select {
+  display: block;
+}
+
+.team-settings-lineHeight {
+  align-items: end;
+  grid-template-columns: minmax(0, 1fr) 104px;
+}
+
+.team-settings-lineHeight > span:first-child {
+  grid-column: 1 / -1;
+}
+.team-settings-lineHeight > span:nth-child(2) {
+  grid-column: 1;
+  grid-row: 2;
+}
+.team-settings-lineHeight input {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.team-settings-assignments {
+  background: rgba(0, 37, 70, 0.62);
+  height: 590px;
+  min-height: 0;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.team-settings-assignmentGrid {
+  display: grid;
+  gap: 0;
+  grid-template-columns: 1fr;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.team-settings-assignmentGrid label {
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 186, 240, 0.24);
+  color: #fff;
+  display: grid;
+  font-size: 15px;
+  gap: 16px;
+  grid-template-columns: minmax(160px, 0.85fr) minmax(0, 1.65fr);
+  min-height: 58px;
+  min-width: 0;
+  padding: 8px 6px;
+}
+
+.team-settings-assignmentGrid label > span {
+  color: #d9f6ff;
+  font-weight: 700;
+}
+
+.team-settings-assignmentSelect {
+  position: relative;
+}
+
+.team-settings-assignmentTrigger,
+.team-settings-assignmentOption {
+  align-items: center;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid #00baf0;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  gap: 8px;
+  min-height: 38px;
+  padding: 6px 9px;
+  text-align: left;
+  width: 100%;
+}
+
+.team-settings-assignmentTrigger:hover,
+.team-settings-assignmentOption:hover {
+  background: rgba(0, 92, 148, 0.74);
+  border-color: #00d9ff;
+}
+
+.team-settings-assignmentTrigger img,
+.team-settings-assignmentOption img {
+  border: 1px solid #00c8ff;
+  border-radius: 50%;
+  height: 26px !important;
+  object-fit: cover;
+  width: 26px !important;
+}
+
+.team-settings-assignmentMenu {
+  background: #03172a;
+  border: 1px solid #00c8ff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.62);
+  left: 0;
+  max-height: 230px;
+  overflow-y: auto;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 10;
+}
+
+.team-settings-assignmentOption {
+  border-color: rgba(0, 186, 240, 0.28);
+  border-width: 0 0 1px;
+}
+
+.team-settings-assignmentOption:last-child {
+  border-bottom: 0;
+}
+
+/* Assignment menus must stay compact even when broad page image rules are present. */
+.team-settings-pitchPanel .team-settings-assignmentMenu {
+  display: block;
+  padding: 0;
+}
+
+.team-settings-pitchPanel
+  .team-settings-assignmentMenu
+  .team-settings-assignmentOption {
+  align-items: center !important;
+  display: flex !important;
+  flex-direction: row !important;
+  font-size: 15px;
+  gap: 10px;
+  min-height: 46px;
+  overflow: hidden;
+}
+
+.team-settings-pitchPanel
+  .team-settings-assignmentMenu
+  .team-settings-assignmentOption
+  img,
+.team-settings-pitchPanel .team-settings-assignmentTrigger img {
+  display: block !important;
+  flex: 0 0 34px !important;
+  height: 34px !important;
+  max-height: 34px !important;
+  max-width: 34px !important;
+  min-height: 34px !important;
+  min-width: 34px !important;
+  object-fit: cover !important;
+  width: 34px !important;
+}
+
+.team-settings-pitchPanel
+  .team-settings-assignmentMenu
+  .team-settings-assignmentOption
+  > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-settings-playerRole {
+  display: grid;
+  gap: 16px;
+}
+
+.team-settings-selectedPlayer {
+  align-items: center;
+  background: rgba(0, 47, 82, 0.68);
+  display: flex;
+  gap: 16px;
+  padding: 14px;
+}
+
+.team-settings-selectedPlayer > img:not(.team-settings-playerCard),
+.team-settings-selectedPlayer > .team-settings-avatarFallback {
+  border: 1px solid #00c8ff;
+  border-radius: 50%;
+  flex: 0 0 48px;
+  height: 48px !important;
+  max-width: 48px;
+  object-fit: cover;
+  width: 48px !important;
+}
+
+.team-settings-selectedPlayer > .team-settings-playerCard {
+  border: 0;
+  flex: 0 0 145px;
+  height: 203px !important;
+  max-width: 145px !important;
+  object-fit: contain;
+  width: 145px !important;
+}
+
+/* Keep assignments as a readable two-column row list, regardless of legacy rules. */
+.team-settings-pitchPanel .team-settings-assignments {
+  height: 590px !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.team-settings-pitchPanel
+  .team-settings-assignments
+  .team-settings-assignmentGrid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  overflow-y: auto !important;
+}
+
+.team-settings-pitchPanel
+  .team-settings-assignments
+  .team-settings-assignmentGrid
+  > label {
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.7fr) !important;
+  min-height: 62px;
+}
+
+.team-settings-selectedPlayer > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.team-settings-selectedPlayer strong {
+  color: #fff;
+  font-size: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.team-settings-nation {
+  display: block;
+  height: 18px !important;
+  max-width: 32px !important;
+  object-fit: contain;
+  width: 32px !important;
+}
+
+.team-settings-selectedPlayer small {
+  font-size: 15px !important;
+}
+
+.team-settings-emptyRole {
+  align-items: center;
+  color: #a9eaff;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: center;
+  margin: 0;
+  text-align: center;
+}
+
+.team-settings-emptyRole span {
+  color: #fff;
+  font-size: 13px;
+}
+.team-settings-notice {
+  color: #72f2bb;
+  margin: 0;
+  text-align: center;
+}
+.team-settings-error {
+  color: #ff8796;
+  margin: 0;
+  text-align: center;
+}
+
+.team-settings-loginPanel {
+  min-height: 620px;
+  padding-top: 78px;
+}
+
+.team-settings-loginPanel > .team-detail-navButton {
+  left: auto;
+  min-width: 142px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: auto;
+}
+
+.team-settings-loginCard {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 460px;
+  padding: 34px;
+  text-align: center;
+}
+
+.team-settings-loginLogo {
+  flex: 0 0 auto;
+  height: 82px;
+  margin: 0 auto 18px;
+  object-fit: contain;
+  width: 82px;
+}
+
+.team-settings-loginCard h2 {
+  color: #fff;
+  display: block;
+  font-size: 28px;
+  margin: 0;
+}
+
+.team-settings-loginCard > p {
+  display: block;
+  font-size: 19px;
+  margin: 8px 0 22px;
+}
+
+.team-settings-loginForm {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  width: 100%;
+}
+
+.team-settings-loginForm input {
+  width: 100%;
+}
+
+.team-settings-loginForm .team-settings-primaryButton {
+  align-items: center;
+  background:
+    radial-gradient(circle at top, rgba(14, 190, 255, 0.2), transparent 42%),
+    rgba(0, 0, 0, 0.78);
+  border-color: rgba(14, 190, 255, 0.72);
+  border-radius: 8px;
+  box-shadow:
+    0 0 12px rgba(14, 190, 255, 0.75),
+    0 0 48px rgba(14, 190, 255, 0.16);
+  font-weight: 800;
+  justify-self: center;
+  min-height: 52px;
+  min-width: 168px;
+}
+.team-settings-textButton {
+  background: transparent;
+  border: 0;
+  color: #00c8ff;
+  cursor: pointer;
+  margin-bottom: 14px;
+  text-decoration: underline;
+}
+
+@media (max-width: 920px) {
+  .team-settings-layout {
+    grid-template-columns: 1fr;
+  }
+  .team-settings-roster,
+  .team-settings-pitchPanel,
+  .team-settings-tactics {
+    min-height: auto;
+  }
+  .team-settings-playerList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .team-settings-topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .team-settings-topbar .team-detail-navButton,
+  .team-settings-topActions,
+  .team-settings-logout {
+    width: 100%;
+  }
+  .team-settings-topActions {
+    flex-direction: column;
+  }
+  .team-settings-topActions .team-settings-primaryButton,
+  .team-settings-topActions .team-settings-logout {
+    width: 100%;
+  }
+  .team-settings-pitch {
+    min-height: 350px;
+  }
+  .team-settings-playerList {
+    grid-template-columns: 1fr;
+  }
+  .team-settings-loginPanel > .team-detail-navButton {
+    position: static;
+    width: 100%;
+  }
+  .team-settings-assignmentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .team-detail-panel {
   width: min(420px, 100%);
   margin: 0 auto;

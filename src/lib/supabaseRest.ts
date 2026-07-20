@@ -36,6 +36,45 @@ export interface TeamPlayerRow extends Fc26PlayerSearchResult {
   transaction_price: number;
 }
 
+export interface TeamTacticSettings {
+  defensiveStyle: "balanced" | "press" | "low-block";
+  buildUpStyle: "balanced" | "counter" | "short-passing";
+  width: number;
+  lineHeight: number;
+}
+
+export interface TeamLineupSlot {
+  slotId: string;
+  playerKey: string;
+  role: "defend" | "balanced" | "attack";
+  playerRole?: string;
+  focus?: string;
+}
+
+export interface TeamSetPieceAssignment {
+  assignmentKey: string;
+  playerKey: string;
+}
+
+export interface TeamTacticsData {
+  formation: string;
+  tactics: TeamTacticSettings;
+  lineup: TeamLineupSlot[];
+  assignments: TeamSetPieceAssignment[];
+}
+
+const DEFAULT_TEAM_TACTICS: TeamTacticsData = {
+  formation: "4-3-3-holding",
+  tactics: {
+    defensiveStyle: "balanced",
+    buildUpStyle: "balanced",
+    width: 50,
+    lineHeight: 50,
+  },
+  lineup: [],
+  assignments: [],
+};
+
 export interface MatchPlayerRow extends TeamPlayerRow {
   team_sname: string;
   yellow_card: number;
@@ -611,6 +650,199 @@ export async function readTeamPlayers(teamSname: string) {
   }
 
   return (await response.json()) as TeamPlayerRow[];
+}
+
+export async function readTeamTactics(teamSname: string): Promise<TeamTacticsData> {
+  if (!hasSupabaseServerConfig()) {
+    return DEFAULT_TEAM_TACTICS;
+  }
+
+  const { restUrl } = getSupabaseServerConfig();
+  const [tacticsResponse, lineupResponse, assignmentsResponse] = await Promise.all([
+    fetch(
+      `${restUrl}/team_tactics?select=formation,tactics&team_sname=eq.${encodeURIComponent(teamSname)}&limit=1`,
+      { headers: apiHeaders(), cache: "no-store" },
+    ),
+    fetch(
+      `${restUrl}/team_lineup_slots?select=slot_id,player_key,role,player_role,focus&team_sname=eq.${encodeURIComponent(teamSname)}&order=slot_id.asc`,
+      { headers: apiHeaders(), cache: "no-store" },
+    ),
+    fetch(
+      `${restUrl}/team_set_piece_assignments?select=assignment_key,player_key&team_sname=eq.${encodeURIComponent(teamSname)}&order=assignment_key.asc`,
+      { headers: apiHeaders(), cache: "no-store" },
+    ),
+  ]);
+
+  if (!tacticsResponse.ok) {
+    throw new Error(`Failed to read team tactics: ${await tacticsResponse.text()}`);
+  }
+
+  if (!lineupResponse.ok) {
+    throw new Error(`Failed to read team lineup: ${await lineupResponse.text()}`);
+  }
+
+  if (!assignmentsResponse.ok) {
+    throw new Error(`Failed to read team assignments: ${await assignmentsResponse.text()}`);
+  }
+
+  const tacticsRows = (await tacticsResponse.json()) as Array<{
+    formation: string;
+    tactics: Partial<TeamTacticSettings> | null;
+  }>;
+  const lineupRows = (await lineupResponse.json()) as Array<{
+    slot_id: string;
+    player_key: string;
+    role: TeamLineupSlot["role"];
+    player_role: string | null;
+    focus: string | null;
+  }>;
+  const assignmentRows = (await assignmentsResponse.json()) as Array<{
+    assignment_key: string;
+    player_key: string;
+  }>;
+  const row = tacticsRows[0];
+
+  return {
+    formation: row?.formation ?? DEFAULT_TEAM_TACTICS.formation,
+    tactics: {
+      ...DEFAULT_TEAM_TACTICS.tactics,
+      ...(row?.tactics ?? {}),
+    },
+    lineup: lineupRows.map((slot) => ({
+      slotId: slot.slot_id,
+      playerKey: slot.player_key,
+      role: slot.role,
+      ...(slot.player_role ? { playerRole: slot.player_role } : {}),
+      ...(slot.focus ? { focus: slot.focus } : {}),
+    })),
+    assignments: assignmentRows.map((assignment) => ({
+      assignmentKey: assignment.assignment_key,
+      playerKey: assignment.player_key,
+    })),
+  };
+}
+
+export async function saveTeamTactics({
+  teamSname,
+  userId,
+  formation,
+  tactics,
+  lineup,
+  assignments,
+}: {
+  teamSname: string;
+  userId: string;
+  formation: string;
+  tactics: TeamTacticSettings;
+  lineup: TeamLineupSlot[];
+  assignments: TeamSetPieceAssignment[];
+}) {
+  const { restUrl } = getSupabaseServerConfig();
+  const now = new Date().toISOString();
+  const sharedHeaders = {
+    ...apiHeaders(),
+    "Content-Type": "application/json",
+  };
+
+  const tacticsResponse = await fetch(
+    `${restUrl}/team_tactics?on_conflict=team_sname`,
+    {
+      method: "POST",
+      headers: {
+        ...sharedHeaders,
+        Prefer: "resolution=merge-duplicates,return=minimal",
+      },
+      body: JSON.stringify({
+        team_sname: teamSname,
+        formation,
+        tactics,
+        updated_by: userId,
+        updated_at: now,
+      }),
+    },
+  );
+
+  if (!tacticsResponse.ok) {
+    throw new Error(`Failed to save team tactics: ${await tacticsResponse.text()}`);
+  }
+
+  const removeResponse = await fetch(
+    `${restUrl}/team_lineup_slots?team_sname=eq.${encodeURIComponent(teamSname)}`,
+    {
+      method: "DELETE",
+      headers: {
+        ...sharedHeaders,
+        Prefer: "return=minimal",
+      },
+    },
+  );
+
+  if (!removeResponse.ok) {
+    throw new Error(`Failed to clear team lineup: ${await removeResponse.text()}`);
+  }
+
+  if (lineup.length > 0) {
+    const lineupResponse = await fetch(`${restUrl}/team_lineup_slots`, {
+      method: "POST",
+      headers: {
+        ...sharedHeaders,
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(
+        lineup.map((slot) => ({
+          team_sname: teamSname,
+          slot_id: slot.slotId,
+          player_key: slot.playerKey,
+          role: slot.role,
+          player_role: slot.playerRole ?? null,
+          focus: slot.focus ?? null,
+        })),
+      ),
+    });
+
+    if (!lineupResponse.ok) {
+      throw new Error(`Failed to save team lineup: ${await lineupResponse.text()}`);
+    }
+  }
+
+  const removeAssignmentsResponse = await fetch(
+    `${restUrl}/team_set_piece_assignments?team_sname=eq.${encodeURIComponent(teamSname)}`,
+    {
+      method: "DELETE",
+      headers: {
+        ...sharedHeaders,
+        Prefer: "return=minimal",
+      },
+    },
+  );
+
+  if (!removeAssignmentsResponse.ok) {
+    throw new Error(`Failed to clear team assignments: ${await removeAssignmentsResponse.text()}`);
+  }
+
+  if (assignments.length === 0) {
+    return;
+  }
+
+  const assignmentsSaveResponse = await fetch(`${restUrl}/team_set_piece_assignments`, {
+    method: "POST",
+    headers: {
+      ...sharedHeaders,
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(
+      assignments.map((assignment) => ({
+        team_sname: teamSname,
+        assignment_key: assignment.assignmentKey,
+        player_key: assignment.playerKey,
+        updated_at: now,
+      })),
+    ),
+  });
+
+  if (!assignmentsSaveResponse.ok) {
+    throw new Error(`Failed to save team assignments: ${await assignmentsSaveResponse.text()}`);
+  }
 }
 
 export async function readSelectedPlayersForTeam(teamSname: string) {
