@@ -51,178 +51,82 @@ type SettingsTab = "formation" | "assignments";
 
 const PLAYER_ROLE_OPTIONS: Record<string, readonly PlayerRoleDefinition[]> = {
   ST: [
-    {
-      name: "\u67f1\u5f0f\u4e2d\u950b",
-      focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u8fb9\u8def"],
-    },
+    { name: "\u67f1\u5f0f\u4e2d\u950b", focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u8fb9\u8def"] },
     { name: "\u4f2a9\u53f7", focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"] },
-    {
-      name: "\u7981\u533a\u4e4b\u738b",
-      focuses: ["\u8fdb\u653b", "\u652f\u63f4", "\u7075\u6d3b"],
-    },
-    {
-      name: "\u7a81\u524d\u578b\u524d\u950b",
-      focuses: ["\u8fdb\u653b", "\u652f\u63f4", "\u7075\u6d3b"],
-    },
+    { name: "\u7981\u533a\u4e4b\u738b", focuses: ["\u8fdb\u653b", "\u652f\u63f4", "\u7075\u6d3b"] },
+    { name: "\u7a81\u524d\u578b\u524d\u950b", focuses: ["\u8fdb\u653b", "\u652f\u63f4", "\u7075\u6d3b"] },
   ],
   CAM: [
-    {
-      name: "\u534a\u8fb9\u950b",
-      focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u81ea\u7531\u8dd1\u52a8"],
-    },
+    { name: "\u534a\u8fb9\u950b", focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u81ea\u7531\u8dd1\u52a8"] },
     { name: "\u5f71\u5b50\u524d\u950b", focuses: ["\u8fdb\u653b"] },
-    {
-      name: "\u7ecf\u517810\u53f7",
-      focuses: ["\u8fdb\u653b", "\u8fb9\u8def", "\u7075\u6d3b"],
-    },
-    {
-      name: "\u7ec4\u7ec7\u6838\u5fc3",
-      focuses: ["\u7ec4\u7ec7", "\u5e73\u8861", "\u81ea\u7531\u8dd1\u52a8"],
-    },
+    { name: "\u7ecf\u517810\u53f7", focuses: ["\u8fdb\u653b", "\u8fb9\u8def", "\u7075\u6d3b"] },
+    { name: "\u7ec4\u7ec7\u6838\u5fc3", focuses: ["\u7ec4\u7ec7", "\u5e73\u8861", "\u81ea\u7531\u8dd1\u52a8"] },
   ],
   CM: [
-    {
-      name: "\u534a\u8fb9\u950b",
-      focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u652f\u63f4"],
-    },
+    { name: "\u534a\u8fb9\u950b", focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u652f\u63f4"] },
     { name: "\u9547\u5b88", focuses: ["\u9632\u5b88", "\u62a2\u7403"] },
-    {
-      name: "\u62d6\u540e\u7ec4\u7ec7\u6838\u5fc3",
-      focuses: ["\u7ec4\u7ec7", "\u9632\u5b88"],
-    },
-    {
-      name: "\u5168\u80fd\u4e2d\u573a",
-      focuses: ["\u5e73\u8861", "\u62a2\u7403"],
-    },
-    {
-      name: "\u7ec4\u7ec7\u6838\u5fc3",
-      focuses: ["\u8fdb\u653b", "\u81ea\u7531\u8dd1\u52a8"],
-    },
+    { name: "\u62d6\u540e\u7ec4\u7ec7\u6838\u5fc3", focuses: ["\u7ec4\u7ec7", "\u9632\u5b88"] },
+    { name: "\u5168\u80fd\u4e2d\u573a", focuses: ["\u5e73\u8861", "\u62a2\u7403"] },
+    { name: "\u7ec4\u7ec7\u6838\u5fc3", focuses: ["\u8fdb\u653b", "\u81ea\u7531\u8dd1\u52a8"] },
   ],
   CDM: [
     { name: "\u7981\u533a\u51b2\u51fb\u8005", focuses: ["\u5e73\u8861"] },
     { name: "\u534a\u8fb9\u536b", focuses: ["\u9632\u5b88", "\u7ec4\u7ec7"] },
     { name: "\u4e2d\u524d\u536b", focuses: ["\u9632\u5b88"] },
-    {
-      name: "\u9547\u5b88",
-      focuses: ["\u9632\u5b88", "\u62a2\u7403", "\u81ea\u7531\u8dd1\u52a8"],
-    },
-    {
-      name: "\u62d6\u540e\u7ec4\u7ec7\u6838\u5fc3",
-      focuses: ["\u7ec4\u7ec7", "\u9632\u5b88", "\u81ea\u7531\u8dd1\u52a8"],
-    },
+    { name: "\u9547\u5b88", focuses: ["\u9632\u5b88", "\u62a2\u7403", "\u81ea\u7531\u8dd1\u52a8"] },
+    { name: "\u62d6\u540e\u7ec4\u7ec7\u6838\u5fc3", focuses: ["\u7ec4\u7ec7", "\u9632\u5b88", "\u81ea\u7531\u8dd1\u52a8"] },
   ],
   CB: [
     { name: "\u540e\u536b", focuses: ["\u9632\u5b88", "\u5e73\u8861"] },
     { name: "\u65bd\u538b", focuses: ["\u5e73\u8861", "\u4fb5\u7565\u6027"] },
-    {
-      name: "\u8fb9\u540e\u536b",
-      focuses: ["\u9632\u5b88", "\u4fb5\u7565\u6027", "\u652f\u63f4"],
-    },
-    {
-      name: "\u63a7\u7403\u540e\u536b",
-      focuses: ["\u9632\u5b88", "\u7ec4\u7ec7", "\u4fb5\u7565\u6027"],
-    },
+    { name: "\u8fb9\u540e\u536b", focuses: ["\u9632\u5b88", "\u4fb5\u7565\u6027", "\u652f\u63f4"] },
+    { name: "\u63a7\u7403\u540e\u536b", focuses: ["\u9632\u5b88", "\u7ec4\u7ec7", "\u4fb5\u7565\u6027"] },
   ],
   LB: [
     { name: "\u4f2a\u540e\u536b", focuses: ["\u9632\u5b88", "\u5e73\u8861"] },
-    {
-      name: "\u8fdb\u653b\u578b\u8fb9\u7ffc\u536b",
-      focuses: ["\u652f\u63f4", "\u8fdb\u653b"],
-    },
-    {
-      name: "\u5185\u5207\u578b\u8fb9\u7ffc\u536b",
-      focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"],
-    },
-    {
-      name: "\u8fb9\u540e\u536b",
-      focuses: ["\u9632\u5b88", "\u5e73\u8861", "\u7075\u6d3b"],
-    },
+    { name: "\u8fdb\u653b\u578b\u8fb9\u7ffc\u536b", focuses: ["\u652f\u63f4", "\u8fdb\u653b"] },
+    { name: "\u5185\u5207\u578b\u8fb9\u7ffc\u536b", focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"] },
+    { name: "\u8fb9\u540e\u536b", focuses: ["\u9632\u5b88", "\u5e73\u8861", "\u7075\u6d3b"] },
     { name: "\u8fb9\u7ffc\u536b", focuses: ["\u5e73\u8861", "\u652f\u63f4"] },
   ],
   RB: [
     { name: "\u4f2a\u540e\u536b", focuses: ["\u9632\u5b88", "\u5e73\u8861"] },
-    {
-      name: "\u8fdb\u653b\u578b\u8fb9\u7ffc\u536b",
-      focuses: ["\u652f\u63f4", "\u8fdb\u653b"],
-    },
-    {
-      name: "\u5185\u5207\u578b\u8fb9\u7ffc\u536b",
-      focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"],
-    },
-    {
-      name: "\u8fb9\u540e\u536b",
-      focuses: ["\u9632\u5b88", "\u5e73\u8861", "\u7075\u6d3b"],
-    },
+    { name: "\u8fdb\u653b\u578b\u8fb9\u7ffc\u536b", focuses: ["\u652f\u63f4", "\u8fdb\u653b"] },
+    { name: "\u5185\u5207\u578b\u8fb9\u7ffc\u536b", focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"] },
+    { name: "\u8fb9\u540e\u536b", focuses: ["\u9632\u5b88", "\u5e73\u8861", "\u7075\u6d3b"] },
     { name: "\u8fb9\u7ffc\u536b", focuses: ["\u5e73\u8861", "\u652f\u63f4"] },
   ],
   LW: [
-    {
-      name: "\u8fb9\u950b",
-      focuses: ["\u5e73\u8861", "\u8fdb\u653b", "\u7075\u6d3b"],
-    },
-    {
-      name: "\u8fb9\u8def\u7ec4\u7ec7\u6838\u5fc3",
-      focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"],
-    },
-    {
-      name: "\u5185\u950b",
-      focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u81ea\u7531\u8dd1\u52a8"],
-    },
+    { name: "\u8fb9\u950b", focuses: ["\u5e73\u8861", "\u8fdb\u653b", "\u7075\u6d3b"] },
+    { name: "\u8fb9\u8def\u7ec4\u7ec7\u6838\u5fc3", focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"] },
+    { name: "\u5185\u950b", focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u81ea\u7531\u8dd1\u52a8"] },
   ],
   RW: [
-    {
-      name: "\u8fb9\u950b",
-      focuses: ["\u5e73\u8861", "\u8fdb\u653b", "\u7075\u6d3b"],
-    },
-    {
-      name: "\u8fb9\u8def\u7ec4\u7ec7\u6838\u5fc3",
-      focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"],
-    },
-    {
-      name: "\u5185\u950b",
-      focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u81ea\u7531\u8dd1\u52a8"],
-    },
+    { name: "\u8fb9\u950b", focuses: ["\u5e73\u8861", "\u8fdb\u653b", "\u7075\u6d3b"] },
+    { name: "\u8fb9\u8def\u7ec4\u7ec7\u6838\u5fc3", focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"] },
+    { name: "\u5185\u950b", focuses: ["\u8fdb\u653b", "\u5e73\u8861", "\u81ea\u7531\u8dd1\u52a8"] },
   ],
   LM: [
     { name: "\u8fb9\u950b", focuses: ["\u8fdb\u653b", "\u5e73\u8861"] },
-    {
-      name: "\u8fb9\u8def\u7ec4\u7ec7\u6838\u5fc3",
-      focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"],
-    },
-    {
-      name: "\u8fb9\u4e2d\u573a",
-      focuses: ["\u652f\u63f4", "\u9632\u5b88", "\u7ec4\u7ec7"],
-    },
+    { name: "\u8fb9\u8def\u7ec4\u7ec7\u6838\u5fc3", focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"] },
+    { name: "\u8fb9\u4e2d\u573a", focuses: ["\u652f\u63f4", "\u9632\u5b88", "\u7ec4\u7ec7"] },
     { name: "\u5185\u950b", focuses: ["\u5e73\u8861", "\u8fdb\u653b"] },
   ],
   RM: [
     { name: "\u8fb9\u950b", focuses: ["\u8fdb\u653b", "\u5e73\u8861"] },
-    {
-      name: "\u8fb9\u8def\u7ec4\u7ec7\u6838\u5fc3",
-      focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"],
-    },
-    {
-      name: "\u8fb9\u4e2d\u573a",
-      focuses: ["\u652f\u63f4", "\u9632\u5b88", "\u7ec4\u7ec7"],
-    },
+    { name: "\u8fb9\u8def\u7ec4\u7ec7\u6838\u5fc3", focuses: ["\u7ec4\u7ec7", "\u8fdb\u653b"] },
+    { name: "\u8fb9\u4e2d\u573a", focuses: ["\u652f\u63f4", "\u9632\u5b88", "\u7ec4\u7ec7"] },
     { name: "\u5185\u950b", focuses: ["\u5e73\u8861", "\u8fdb\u653b"] },
   ],
   GK: [
     { name: "\u5b88\u95e8\u5458", focuses: ["\u9632\u5b88", "\u5e73\u8861"] },
     { name: "\u51fa\u7403\u578b\u95e8\u5c06", focuses: ["\u7ec4\u7ec7"] },
-    {
-      name: "\u6e05\u9053\u592b\u95e8\u5c06",
-      focuses: ["\u5e73\u8861", "\u7ec4\u7ec7"],
-    },
+    { name: "\u6e05\u9053\u592b\u95e8\u5c06", focuses: ["\u5e73\u8861", "\u7ec4\u7ec7"] },
   ],
 };
 
 const GENERIC_PLAYER_ROLES: readonly PlayerRoleDefinition[] = [
-  {
-    name: "\u5e73\u8861",
-    focuses: ["\u5e73\u8861", "\u8fdb\u653b", "\u9632\u5b88"],
-  },
+  { name: "\u5e73\u8861", focuses: ["\u5e73\u8861", "\u8fdb\u653b", "\u9632\u5b88"] },
 ];
 
 const SET_PIECE_ASSIGNMENTS = [
@@ -233,41 +137,21 @@ const SET_PIECE_ASSIGNMENTS = [
   { key: "penalty", label: "\u70b9\u7403" },
   { key: "corner-left", label: "\u5de6\u89d2\u7403\u4e3b\u7f5a\u961f\u5458" },
   { key: "corner-right", label: "\u53f3\u89d2\u7403\u4e3b\u7f5a\u961f\u5458" },
-  {
-    key: "corner-attack-target",
-    label: "\u89d2\u7403-\u8fdb\u653b\uff08\u7ad9\u6869\u4e2d\u950b\uff09",
-  },
-  {
-    key: "corner-attack-near-post",
-    label: "\u89d2\u7403-\u8fdb\u653b\uff08\u8fd1\u95e8\u67f1\uff09",
-  },
-  {
-    key: "corner-attack-edge",
-    label: "\u89d2\u7403-\u8fdb\u653b\uff08\u7981\u533a\u5f27\u9876\uff09",
-  },
-  {
-    key: "corner-attack-cover",
-    label: "\u89d2\u7403-\u8fdb\u653b\uff08\u9632\u5b88\u8865\u4f4d\uff09",
-  },
-  {
-    key: "corner-attack-decoy",
-    label: "\u89d2\u7403-\u8fdb\u653b\uff08\u5a01\u80c1\u8bb0\u53f7\uff09",
-  },
-  {
-    key: "corner-attack-post-guard",
-    label: "\u89d2\u7403-\u8fdb\u653b\uff08\u95e8\u67f1\u5b88\u536b\uff09",
-  },
-  {
-    key: "corner-defend-near-post",
-    label: "\u89d2\u7403-\u9632\u5b88\uff08\u8fd1\u95e8\u67f1\uff09",
-  },
-  {
-    key: "corner-defend-far-post",
-    label: "\u89d2\u7403-\u9632\u5b88\uff08\u8fdc\u95e8\u67f1\uff09",
-  },
+  { key: "corner-attack-target", label: "\u89d2\u7403-\u8fdb\u653b\uff08\u7ad9\u6869\u4e2d\u950b\uff09" },
+  { key: "corner-attack-near-post", label: "\u89d2\u7403-\u8fdb\u653b\uff08\u8fd1\u95e8\u67f1\uff09" },
+  { key: "corner-attack-edge", label: "\u89d2\u7403-\u8fdb\u653b\uff08\u7981\u533a\u5f27\u9876\uff09" },
+  { key: "corner-attack-cover", label: "\u89d2\u7403-\u8fdb\u653b\uff08\u9632\u5b88\u8865\u4f4d\uff09" },
+  { key: "corner-attack-decoy", label: "\u89d2\u7403-\u8fdb\u653b\uff08\u5a01\u80c1\u8bb0\u53f7\uff09" },
+  { key: "corner-attack-post-guard", label: "\u89d2\u7403-\u8fdb\u653b\uff08\u95e8\u67f1\u5b88\u536b\uff09" },
+  { key: "corner-defend-near-post", label: "\u89d2\u7403-\u9632\u5b88\uff08\u8fd1\u95e8\u67f1\uff09" },
+  { key: "corner-defend-far-post", label: "\u89d2\u7403-\u9632\u5b88\uff08\u8fdc\u95e8\u67f1\uff09" },
   { key: "throw-in-left", label: "\u5de6\u63b7\u754c\u5916\u7403" },
   { key: "throw-in-right", label: "\u53f3\u63b7\u754c\u5916\u7403" },
 ] as const;
+
+function playerDisplayName(player: TeamPlayerRow) {
+  return player.canonical_name?.trim() || player.name;
+}
 
 function AssignmentPlayerSelect({
   onChange,
@@ -294,11 +178,9 @@ function AssignmentPlayerSelect({
             {selectedPlayer.avatar_url ? (
               <img src={selectedPlayer.avatar_url} alt="" />
             ) : (
-              <span className="team-settings-avatarFallback">
-                {selectedPlayer.name.slice(0, 1)}
-              </span>
+              <span className="team-settings-avatarFallback">{playerDisplayName(selectedPlayer).slice(0, 1)}</span>
             )}
-            <span>{selectedPlayer.name}</span>
+            <span>{playerDisplayName(selectedPlayer)}</span>
           </>
         ) : (
           <span>{"\u8bf7\u9009\u62e9\u7403\u5458"}</span>
@@ -329,11 +211,9 @@ function AssignmentPlayerSelect({
               {player.avatar_url ? (
                 <img src={player.avatar_url} alt="" />
               ) : (
-                <span className="team-settings-avatarFallback">
-                  {player.name.slice(0, 1)}
-                </span>
+                <span className="team-settings-avatarFallback">{playerDisplayName(player).slice(0, 1)}</span>
               )}
-              <span>{player.name}</span>
+              <span>{playerDisplayName(player)}</span>
             </button>
           ))}
         </div>
@@ -343,9 +223,7 @@ function AssignmentPlayerSelect({
 }
 
 function messageFromResponse(data: unknown, fallback: string) {
-  return typeof data === "object" &&
-    data !== null &&
-    "error" in data &&
+  return typeof data === "object" && data !== null && "error" in data &&
     typeof data.error === "string"
     ? data.error
     : fallback;
@@ -367,8 +245,7 @@ export default function TeamSettingsClient({
   const [playerRoles, setPlayerRoles] = useState<Record<string, string>>({});
   const [playerFocus, setPlayerFocus] = useState<Record<string, string>>({});
   const [assignments, setAssignments] = useState<Record<string, string>>({});
-  const [activeSettingsTab, setActiveSettingsTab] =
-    useState<SettingsTab>("formation");
+  const [activeSettingsTab, setActiveSettingsTab] = useState<SettingsTab>("formation");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -396,9 +273,7 @@ export default function TeamSettingsClient({
     if (response.status === 403) {
       setPayload(null);
       setAccess("forbidden");
-      setError(
-        messageFromResponse(data, "This account cannot manage this team."),
-      );
+      setError(messageFromResponse(data, "This account cannot manage this team."));
       return;
     }
 
@@ -416,28 +291,15 @@ export default function TeamSettingsClient({
     setFormation(nextFormation);
     setTactics({ ...defaultTactics, ...data.tactics.tactics });
     setLineup(data.tactics.lineup);
-    setPlayerRoles(
-      Object.fromEntries(
-        data.tactics.lineup.flatMap((slot) =>
-          slot.playerRole ? [[slot.slotId, slot.playerRole]] : [],
-        ),
-      ),
-    );
-    setPlayerFocus(
-      Object.fromEntries(
-        data.tactics.lineup.flatMap((slot) =>
-          slot.focus ? [[slot.slotId, slot.focus]] : [],
-        ),
-      ),
-    );
-    setAssignments(
-      Object.fromEntries(
-        data.tactics.assignments.map((assignment) => [
-          assignment.assignmentKey,
-          assignment.playerKey,
-        ]),
-      ),
-    );
+    setPlayerRoles(Object.fromEntries(
+      data.tactics.lineup.flatMap((slot) => slot.playerRole ? [[slot.slotId, slot.playerRole]] : []),
+    ));
+    setPlayerFocus(Object.fromEntries(
+      data.tactics.lineup.flatMap((slot) => slot.focus ? [[slot.slotId, slot.focus]] : []),
+    ));
+    setAssignments(Object.fromEntries(
+      data.tactics.assignments.map((assignment) => [assignment.assignmentKey, assignment.playerKey]),
+    ));
     setAccess("ready");
   }, [teamSlug]);
 
@@ -451,10 +313,7 @@ export default function TeamSettingsClient({
     [lineup],
   );
   const playerByKey = useMemo(
-    () =>
-      new Map(
-        payload?.players.map((player) => [player.player_key, player]) ?? [],
-      ),
+    () => new Map(payload?.players.map((player) => [player.player_key, player]) ?? []),
     [payload],
   );
   const assignedKeys = useMemo(
@@ -471,16 +330,15 @@ export default function TeamSettingsClient({
     ? playerByKey.get(selectedAssignment.playerKey)
     : undefined;
   const selectedRoleOptions = selectedSlot
-    ? (PLAYER_ROLE_OPTIONS[selectedSlot.label] ?? GENERIC_PLAYER_ROLES)
+    ? PLAYER_ROLE_OPTIONS[selectedSlot.label] ?? GENERIC_PLAYER_ROLES
     : GENERIC_PLAYER_ROLES;
   const selectedRoleName = selectedAssignment
-    ? (playerRoles[selectedAssignment.slotId] ?? selectedRoleOptions[0].name)
+    ? playerRoles[selectedAssignment.slotId] ?? selectedRoleOptions[0].name
     : "";
-  const selectedRole =
-    selectedRoleOptions.find((role) => role.name === selectedRoleName) ??
-    selectedRoleOptions[0];
+  const selectedRole = selectedRoleOptions.find((role) => role.name === selectedRoleName)
+    ?? selectedRoleOptions[0];
   const selectedFocus = selectedAssignment
-    ? (playerFocus[selectedAssignment.slotId] ?? selectedRole.focuses[0])
+    ? playerFocus[selectedAssignment.slotId] ?? selectedRole.focuses[0]
     : "";
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
@@ -527,14 +385,8 @@ export default function TeamSettingsClient({
       { slotId, playerKey, role: slot.defaultRole },
     ]);
     const roleOptions = PLAYER_ROLE_OPTIONS[slot.label] ?? GENERIC_PLAYER_ROLES;
-    setPlayerRoles((current) => ({
-      ...current,
-      [slotId]: current[slotId] ?? roleOptions[0].name,
-    }));
-    setPlayerFocus((current) => ({
-      ...current,
-      [slotId]: current[slotId] ?? roleOptions[0].focuses[0],
-    }));
+    setPlayerRoles((current) => ({ ...current, [slotId]: current[slotId] ?? roleOptions[0].name }));
+    setPlayerFocus((current) => ({ ...current, [slotId]: current[slotId] ?? roleOptions[0].focuses[0] }));
     setSelectedSlotId(slotId);
   };
 
@@ -562,9 +414,8 @@ export default function TeamSettingsClient({
   };
 
   const updatePlayerRole = (slotId: string, roleName: string) => {
-    const role =
-      selectedRoleOptions.find((item) => item.name === roleName) ??
-      selectedRoleOptions[0];
+    const role = selectedRoleOptions.find((item) => item.name === roleName)
+      ?? selectedRoleOptions[0];
 
     setPlayerRoles((current) => ({ ...current, [slotId]: role.name }));
     setPlayerFocus((current) => ({ ...current, [slotId]: role.focuses[0] }));
@@ -612,10 +463,7 @@ export default function TeamSettingsClient({
   if (access === "login" || access === "forbidden") {
     return (
       <section className="team-settings-loginPanel">
-        <Link
-          href={`/teams/${encodeURIComponent(teamSlug)}`}
-          className="team-detail-navButton"
-        >
+        <Link href={`/teams/${encodeURIComponent(teamSlug)}`} className="team-detail-navButton">
           <span>{"\u8fd4\u56de\u9635\u5bb9"}</span>
           <span>Back to Teams</span>
         </Link>
@@ -624,11 +472,7 @@ export default function TeamSettingsClient({
           <h2>{"\u7403\u961f\u8bbe\u7f6e\u767b\u5f55"}</h2>
           <p>Team Settings Login</p>
           {access === "forbidden" ? (
-            <button
-              className="team-settings-textButton"
-              type="button"
-              onClick={logout}
-            >
+            <button className="team-settings-textButton" type="button" onClick={logout}>
               Use another account
             </button>
           ) : (
@@ -648,11 +492,7 @@ export default function TeamSettingsClient({
                 type="password"
                 value={password}
               />
-              <button
-                className="team-settings-primaryButton"
-                disabled={isLoggingIn}
-                type="submit"
-              >
+              <button className="team-settings-primaryButton" disabled={isLoggingIn} type="submit">
                 <span>{"\u767b\u5f55"}</span>
                 <span>{isLoggingIn ? "Logging in..." : "Login"}</span>
               </button>
@@ -667,10 +507,7 @@ export default function TeamSettingsClient({
   return (
     <section className="team-settings-shell">
       <div className="team-settings-topbar">
-        <Link
-          href={`/teams/${encodeURIComponent(teamSlug)}`}
-          className="team-detail-navButton"
-        >
+        <Link href={`/teams/${encodeURIComponent(teamSlug)}`} className="team-detail-navButton">
           <span>{"\u8fd4\u56de\u9635\u5bb9"}</span>
           <span>Back to Teams</span>
         </Link>
@@ -682,20 +519,11 @@ export default function TeamSettingsClient({
           </div>
         </div>
         <div className="team-settings-topActions">
-          <button
-            className="team-settings-primaryButton"
-            disabled={isSaving}
-            onClick={saveSettings}
-            type="button"
-          >
+          <button className="team-settings-primaryButton" disabled={isSaving} onClick={saveSettings} type="button">
             <span>{"\u4fdd\u5b58\u8bbe\u7f6e"}</span>
             <span>{isSaving ? "Saving..." : "Save Settings"}</span>
           </button>
-          <button
-            className="team-settings-logout"
-            onClick={logout}
-            type="button"
-          >
+          <button className="team-settings-logout" onClick={logout} type="button">
             <span>{"\u9000\u51fa"}</span>
             <span>Logout</span>
           </button>
@@ -710,44 +538,25 @@ export default function TeamSettingsClient({
           </div>
           <p className="team-settings-hint">Drag a player onto a position.</p>
           <div className="team-settings-playerList">
-            {payload?.players.length ? (
-              payload.players.map((player) => (
-                <button
-                  className={`team-settings-player${assignedKeys.has(player.player_key) ? " is-assigned" : ""}`}
-                  draggable
-                  key={player.player_key}
-                  onDragStart={(event) =>
-                    event.dataTransfer.setData("text/plain", player.player_key)
-                  }
-                  onClick={() => {
-                    const firstAvailable = slots.find(
-                      (slot) => !assignedBySlot.has(slot.id),
-                    );
-                    if (firstAvailable)
-                      setPlayerInSlot(firstAvailable.id, player.player_key);
-                  }}
-                  type="button"
-                >
-                  {player.avatar_url ? (
-                    <img src={player.avatar_url} alt="" />
-                  ) : (
-                    <span className="team-settings-avatarFallback">
-                      {player.name.slice(0, 1)}
-                    </span>
-                  )}
-                  <span>
-                    <strong>{player.name}</strong>
-                    <small>
-                      {player.overall_rating} {player.position}
-                    </small>
-                  </span>
-                </button>
-              ))
-            ) : (
-              <p className="team-settings-empty">
-                No players in this squad yet.
-              </p>
-            )}
+            {payload?.players.length ? payload.players.map((player) => (
+              <button
+                className={`team-settings-player${assignedKeys.has(player.player_key) ? " is-assigned" : ""}`}
+                draggable
+                key={player.player_key}
+                onDragStart={(event) => event.dataTransfer.setData("text/plain", player.player_key)}
+                onClick={() => {
+                  const firstAvailable = slots.find((slot) => !assignedBySlot.has(slot.id));
+                  if (firstAvailable) setPlayerInSlot(firstAvailable.id, player.player_key);
+                }}
+                type="button"
+              >
+                {player.avatar_url ? <img src={player.avatar_url} alt="" /> : <span className="team-settings-avatarFallback">{playerDisplayName(player).slice(0, 1)}</span>}
+                <span>
+                  <strong>{playerDisplayName(player)}</strong>
+                  <small>{player.overall_rating} {player.position}</small>
+                </span>
+              </button>
+            )) : <p className="team-settings-empty">No players in this squad yet.</p>}
           </div>
         </aside>
 
@@ -774,126 +583,90 @@ export default function TeamSettingsClient({
               <small>Assignments</small>
             </button>
           </div>
-          {activeSettingsTab === "formation" && (
-            <>
+          {activeSettingsTab === "formation" && <>
+          <select
+            className="team-settings-select"
+            onChange={(event) => updateFormation(event.target.value as FormationKey)}
+            value={formation}
+          >
+            {Object.entries(TEAM_FORMATIONS).map(([key, definition]) => (
+              <option key={key} value={key}>{definition.label}</option>
+            ))}
+          </select>
+          <div className="team-settings-pitch">
+            <div className="team-settings-pitchCenter" />
+            {slots.map((slot) => {
+              const assigned = assignedBySlot.get(slot.id);
+              const player = assigned ? playerByKey.get(assigned.playerKey) : null;
+              return (
+                <button
+                  className={`team-settings-slot${player ? " is-filled" : ""}`}
+                  key={slot.id}
+                  onClick={() => player && setSelectedSlotId(slot.id)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={(event) => onDrop(event, slot.id)}
+                  style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
+                  title={player ? `Remove ${playerDisplayName(player)}` : `Drop player in ${slot.label}`}
+                  type="button"
+                >
+                  {player?.avatar_url ? <img src={player.avatar_url} alt="" /> : <span>{slot.label}</span>}
+                  <small>{player ? playerDisplayName(player) : slot.label}</small>
+                </button>
+              );
+            })}
+          </div>
+          <div className="team-settings-teamTactics">
+            <div className="team-settings-sectionTitle">
+              <span>{"\u7403\u961f\u6218\u672f"}</span>
+              <span>Team Tactics</span>
+            </div>
+            <label>
+              <span>{"\u7ec4\u7ec7\u98ce\u683c"} <small>Build up style</small></span>
               <select
-                className="team-settings-select"
-                onChange={(event) =>
-                  updateFormation(event.target.value as FormationKey)
-                }
-                value={formation}
+                value={tactics.buildUpStyle}
+                onChange={(event) => setTactics((current) => ({
+                  ...current,
+                  buildUpStyle: event.target.value as TeamTacticSettings["buildUpStyle"],
+                }))}
               >
-                {Object.entries(TEAM_FORMATIONS).map(([key, definition]) => (
-                  <option key={key} value={key}>
-                    {definition.label}
-                  </option>
-                ))}
+                <option value="short-passing">{"\u77ed\u4f20"} / Short passing</option>
+                <option value="counter">{"\u53cd\u51fb"} / Counter</option>
+                <option value="balanced">{"\u5e73\u8861"} / Balanced</option>
               </select>
-              <div className="team-settings-pitch">
-                <div className="team-settings-pitchCenter" />
-                {slots.map((slot) => {
-                  const assigned = assignedBySlot.get(slot.id);
-                  const player = assigned
-                    ? playerByKey.get(assigned.playerKey)
-                    : null;
-                  return (
-                    <button
-                      className={`team-settings-slot${player ? " is-filled" : ""}`}
-                      key={slot.id}
-                      onClick={() => player && setSelectedSlotId(slot.id)}
-                      onDragOver={(event) => event.preventDefault()}
-                      onDrop={(event) => onDrop(event, slot.id)}
-                      style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
-                      title={
-                        player
-                          ? `Remove ${player.name}`
-                          : `Drop player in ${slot.label}`
-                      }
-                      type="button"
-                    >
-                      {player?.avatar_url ? (
-                        <img src={player.avatar_url} alt="" />
-                      ) : (
-                        <span>{slot.label}</span>
-                      )}
-                      <small>{player ? player.name : slot.label}</small>
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="team-settings-teamTactics">
-                <div className="team-settings-sectionTitle">
-                  <span>{"\u7403\u961f\u6218\u672f"}</span>
-                  <span>Team Tactics</span>
-                </div>
-                <label>
-                  <span>
-                    {"\u7ec4\u7ec7\u98ce\u683c"} <small>Build up style</small>
-                  </span>
-                  <select
-                    value={tactics.buildUpStyle}
-                    onChange={(event) =>
-                      setTactics((current) => ({
-                        ...current,
-                        buildUpStyle: event.target
-                          .value as TeamTacticSettings["buildUpStyle"],
-                      }))
-                    }
-                  >
-                    <option value="short-passing">
-                      {"\u77ed\u4f20"} / Short passing
-                    </option>
-                    <option value="counter">{"\u53cd\u51fb"} / Counter</option>
-                    <option value="balanced">
-                      {"\u5e73\u8861"} / Balanced
-                    </option>
-                  </select>
-                </label>
-                <label className="team-settings-lineHeight">
-                  <span>
-                    {"\u9632\u5b88\u65b9\u9488"}{" "}
-                    <small>Defensive approach</small>
-                  </span>
-                  <span>
-                    {"\u9632\u7ebf\u9ad8\u5ea6"} <small>Line height</small>
-                  </span>
-                  <input
-                    max="100"
-                    min="1"
-                    onChange={(event) =>
-                      setTactics((current) => ({
-                        ...current,
-                        lineHeight: Number(event.target.value),
-                      }))
-                    }
-                    type="number"
-                    value={tactics.lineHeight}
+            </label>
+            <label className="team-settings-lineHeight">
+              <span>{"\u9632\u5b88\u65b9\u9488"} <small>Defensive approach</small></span>
+              <span>{"\u9632\u7ebf\u9ad8\u5ea6"} <small>Line height</small></span>
+              <input
+                max="100"
+                min="1"
+                onChange={(event) => setTactics((current) => ({
+                  ...current,
+                  lineHeight: Number(event.target.value),
+                }))}
+                type="number"
+                value={tactics.lineHeight}
+              />
+            </label>
+          </div>
+          </>}
+          {activeSettingsTab === "assignments" && <section className="team-settings-assignments">
+            <div className="team-settings-assignmentGrid">
+              {SET_PIECE_ASSIGNMENTS.map((assignment) => (
+                <label key={assignment.key}>
+                  <span>{assignment.label}</span>
+                  <AssignmentPlayerSelect
+                    onChange={(playerKey) => setAssignments((current) => ({
+                      ...current,
+                      [assignment.key]: playerKey,
+                    }))}
+                    players={payload?.players ?? []}
+                    value={assignments[assignment.key] ?? ""}
                   />
                 </label>
-              </div>
-            </>
-          )}
-          {activeSettingsTab === "assignments" && (
-            <section className="team-settings-assignments">
-              <div className="team-settings-assignmentGrid">
-                {SET_PIECE_ASSIGNMENTS.map((assignment) => (
-                  <label key={assignment.key}>
-                    <span>{assignment.label}</span>
-                    <AssignmentPlayerSelect
-                      onChange={(playerKey) =>
-                        setAssignments((current) => ({
-                          ...current,
-                          [assignment.key]: playerKey,
-                        }))
-                      }
-                      players={payload?.players ?? []}
-                      value={assignments[assignment.key] ?? ""}
-                    />
-                  </label>
-                ))}
-              </div>
-            </section>
-          )}
+              ))}
+            </div>
+          </section>}
         </main>
 
         <aside className="team-settings-tactics">
@@ -904,86 +677,52 @@ export default function TeamSettingsClient({
           {selectedAssignment && selectedPlayer ? (
             <div className="team-settings-playerRole">
               <div className="team-settings-selectedPlayer">
-                {(selectedPlayer.card_image_url ??
-                selectedPlayer.card_image_public_url) ? (
+                {selectedPlayer.card_image_url ?? selectedPlayer.card_image_public_url ? (
                   <img
                     className="team-settings-playerCard"
-                    src={
-                      selectedPlayer.card_image_url ??
-                      selectedPlayer.card_image_public_url ??
-                      ""
-                    }
-                    alt={`${selectedPlayer.name} card`}
+                    src={selectedPlayer.card_image_url ?? selectedPlayer.card_image_public_url ?? ""}
+                    alt={`${playerDisplayName(selectedPlayer)} card`}
                   />
                 ) : selectedPlayer.avatar_url ? (
                   <img src={selectedPlayer.avatar_url} alt="" />
                 ) : (
-                  <span className="team-settings-avatarFallback">
-                    {selectedPlayer.name.slice(0, 1)}
-                  </span>
+                  <span className="team-settings-avatarFallback">{playerDisplayName(selectedPlayer).slice(0, 1)}</span>
                 )}
                 <div>
-                  {selectedPlayer.nation_image_url && (
-                    <img
-                      className="team-settings-nation"
-                      src={selectedPlayer.nation_image_url}
-                      alt=""
-                    />
-                  )}
-                  <strong>{selectedPlayer.name}</strong>
-                  <small>
-                    {selectedPlayer.overall_rating} {selectedPlayer.position}
-                  </small>
+                  {selectedPlayer.nation_image_url && <img className="team-settings-nation" src={selectedPlayer.nation_image_url} alt="" />}
+                  <strong>{playerDisplayName(selectedPlayer)}</strong>
+                  <small>{selectedPlayer.overall_rating} {selectedPlayer.position}</small>
                 </div>
               </div>
               <label>
-                <span>
-                  {"\u89d2\u8272"} <small>Role</small>
-                </span>
+                <span>{"\u89d2\u8272"} <small>Role</small></span>
                 <select
-                  onChange={(event) =>
-                    updatePlayerRole(
-                      selectedAssignment.slotId,
-                      event.target.value,
-                    )
-                  }
+                  onChange={(event) => updatePlayerRole(selectedAssignment.slotId, event.target.value)}
                   value={selectedRoleName}
                 >
                   {selectedRoleOptions.map((role) => (
-                    <option key={role.name} value={role.name}>
-                      {role.name}
-                    </option>
+                    <option key={role.name} value={role.name}>{role.name}</option>
                   ))}
                 </select>
               </label>
               <label>
-                <span>
-                  {"\u4fa7\u91cd\u70b9"} <small>Focus</small>
-                </span>
+                <span>{"\u4fa7\u91cd\u70b9"} <small>Focus</small></span>
                 <select
                   value={selectedFocus}
-                  onChange={(event) =>
-                    setPlayerFocus((current) => ({
-                      ...current,
-                      [selectedAssignment.slotId]: event.target.value,
-                    }))
-                  }
+                  onChange={(event) => setPlayerFocus((current) => ({
+                    ...current,
+                    [selectedAssignment.slotId]: event.target.value,
+                  }))}
                 >
                   {selectedRole.focuses.map((focus) => (
-                    <option key={focus} value={focus}>
-                      {focus}
-                    </option>
+                    <option key={focus} value={focus}>{focus}</option>
                   ))}
                 </select>
               </label>
               <button
                 className="team-settings-textButton"
                 onClick={() => {
-                  setLineup((items) =>
-                    items.filter(
-                      (item) => item.slotId !== selectedAssignment.slotId,
-                    ),
-                  );
+                  setLineup((items) => items.filter((item) => item.slotId !== selectedAssignment.slotId));
                   setSelectedSlotId(null);
                 }}
                 type="button"
@@ -993,9 +732,7 @@ export default function TeamSettingsClient({
             </div>
           ) : (
             <p className="team-settings-emptyRole">
-              {
-                "\u70b9\u51fb\u9635\u578b\u4e2d\u5df2\u653e\u7f6e\u7684\u7403\u5458\u4ee5\u8bbe\u7f6e\u89d2\u8272\u3002"
-              }
+              {"\u70b9\u51fb\u9635\u578b\u4e2d\u5df2\u653e\u7f6e\u7684\u7403\u5458\u4ee5\u8bbe\u7f6e\u89d2\u8272\u3002"}
               <span>Select a placed player to edit their role.</span>
             </p>
           )}
