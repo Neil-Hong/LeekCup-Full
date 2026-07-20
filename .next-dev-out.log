@@ -144,3 +144,6 @@
  GET /teams/AC/settings 200 in 179ms (next.js: 145ms, proxy.ts: 10ms, application-code: 23ms)
  GET /api/team-settings?teamSname=AC 401 in 696ms (next.js: 127ms, proxy.ts: 11ms, application-code: 558ms)
  GET /api/team-settings?teamSname=AC 401 in 699ms (next.js: 117ms, proxy.ts: 9ms, application-code: 573ms)
+ POST /api/auction/login 200 in 598ms (next.js: 20ms, proxy.ts: 4ms, application-code: 574ms)
+ GET /api/team-settings?teamSname=AC 200 in 286ms (next.js: 1734µs, proxy.ts: 2ms, application-code: 282ms)
+ GET /teams/AC 200 in 480ms (next.js: 18ms, proxy.ts: 2ms, generate-params: 5ms, application-code: 459ms)
