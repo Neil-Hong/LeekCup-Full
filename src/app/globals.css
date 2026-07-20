@@ -3602,7 +3602,8 @@ form.site-auth-panel > * {
   align-items: center;
   background: rgba(0, 47, 82, 0.68);
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 10px;
   padding: 14px;
 }
 
@@ -3651,7 +3652,9 @@ form.site-auth-panel > * {
 .team-settings-selectedPlayer > div {
   display: grid;
   gap: 3px;
+  justify-items: center;
   min-width: 0;
+  text-align: center;
 }
 
 .team-settings-selectedPlayer strong {

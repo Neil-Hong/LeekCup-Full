@@ -16,6 +16,7 @@ import type {
   TeamTacticsData,
   TeamTacticSettings,
 } from "@/lib/supabaseRest";
+import { normalizeSavedLineup } from "@/lib/teamLineupMigration";
 import {
   isFormationKey,
   TEAM_FORMATIONS,
@@ -287,15 +288,16 @@ export default function TeamSettingsClient({
     const nextFormation = isFormationKey(data.tactics.formation)
       ? data.tactics.formation
       : "4-3-3-holding";
+    const nextLineup = normalizeSavedLineup(nextFormation, data.tactics.lineup);
     setPayload(data);
     setFormation(nextFormation);
     setTactics({ ...defaultTactics, ...data.tactics.tactics });
-    setLineup(data.tactics.lineup);
+    setLineup(nextLineup);
     setPlayerRoles(Object.fromEntries(
-      data.tactics.lineup.flatMap((slot) => slot.playerRole ? [[slot.slotId, slot.playerRole]] : []),
+      nextLineup.flatMap((slot) => slot.playerRole ? [[slot.slotId, slot.playerRole]] : []),
     ));
     setPlayerFocus(Object.fromEntries(
-      data.tactics.lineup.flatMap((slot) => slot.focus ? [[slot.slotId, slot.focus]] : []),
+      nextLineup.flatMap((slot) => slot.focus ? [[slot.slotId, slot.focus]] : []),
     ));
     setAssignments(Object.fromEntries(
       data.tactics.assignments.map((assignment) => [assignment.assignmentKey, assignment.playerKey]),
