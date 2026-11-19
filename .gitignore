@@ -47,3 +47,7 @@ next-env.d.ts
 # local logs and notes
 .next-dev-*.log
 problems
+
+# private: database migrations and tests
+supabase/migrations/
+tests/

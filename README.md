@@ -75,10 +75,9 @@ Copy `.env.example` to `.env.local` and fill in the values:
 
 ### 3. Set up the database
 
-Apply the SQL files in [`supabase/migrations`](supabase/migrations) to your
-Supabase project in filename order (for example with `supabase db push`). They
-create the player, auction, session, tactics and lineup tables and seed the 16
-auction team accounts.
+The app needs a Supabase project with the player, auction, session, tactics
+and lineup tables. The SQL migrations are kept privately and are not part of
+this repository; ask the maintainer for access.
 
 ### 4. Run
 
@@ -96,7 +95,6 @@ Open <http://localhost:3000>. To try the admin features locally, set `SITE_MODE=
 | `npm run build` | Build for production |
 | `npm run start` | Serve the production build |
 | `npm run lint` | Run ESLint |
-| `node --test tests/*.test.mjs` | Run the unit tests (Node 22.6+ for TypeScript imports) |
 
 ## Project structure
 
@@ -107,10 +105,7 @@ src/
   data/           Static team data used by the draw
   lib/            Auth, Supabase REST helpers, group-stage logic, formations
   proxy.ts        Admin-site route protection
-supabase/
-  migrations/     Database schema and seed data
 public/           Club badges, fonts, 3D model, audio and video
-tests/            Node test runner unit tests
 docs/screenshots/ Images used in this README
 ```
 
